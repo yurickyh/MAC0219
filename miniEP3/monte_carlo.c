@@ -167,6 +167,7 @@ int main(int argc, char **argv) {
       printf("Running parallel version\n");
     }
 
+    long double acc = 0.0;
     float work_per_thread = (size / n_threads);
     thread_data base_data;
 
@@ -194,7 +195,6 @@ int main(int argc, char **argv) {
                      &thread_data_array[i]);
     }
 
-    double acc = 0.0;
     for (int i = 0; i < n_threads; i++) {
       pthread_join(threads[i], NULL);
       acc += results[i];
