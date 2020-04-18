@@ -1,0 +1,6 @@
+.DS_Store
+.ipynb_checkpoints
+
+*.o
+*.out
+monte_carlo
