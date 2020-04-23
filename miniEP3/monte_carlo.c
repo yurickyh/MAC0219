@@ -2,6 +2,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include <time.h>
 
 #ifndef DEBUG
@@ -14,7 +15,16 @@
 
 #define FUNCTIONS 1
 
-clock_t start, end;
+struct timer_info {
+  clock_t c_start;
+  clock_t c_end;
+  struct timespec t_start;
+  struct timespec t_end;
+  struct timeval v_start;
+  struct timeval v_end;
+};
+
+struct timer_info timer;
 
 char *usage_message = "usage: ./monte_carlo SAMPLES FUNCTION_ID N_THREADS\n";
 
@@ -96,7 +106,7 @@ void *monte_carlo_integrate_thread(void *args) {
   long int left = td->interval_start;
   long int right = td->interval_end;
 
-  int num_iterations = right - left;
+  long int num_iterations = right - left;
   long double (*f)(long double) = td->f;
   long double *samples = td->samples;
   long double *results = td->results;
@@ -113,15 +123,15 @@ void *monte_carlo_integrate_thread(void *args) {
 
 int main(int argc, char **argv) {
   if (argc != 4) {
-    printf(usage_message);
+    printf("%s", usage_message);
     exit(-1);
   } else if (atoi(argv[2]) >= FUNCTIONS || atoi(argv[2]) < 0) {
     printf("Error: FUNCTION_ID must in [0,%d]\n", FUNCTIONS - 1);
-    printf(usage_message);
+    printf("%s", usage_message);
     exit(-1);
   } else if (atoi(argv[3]) < 0) {
     printf("Error: I need at least 1 thread\n");
-    printf(usage_message);
+    printf("%s", usage_message);
     exit(-1);
   }
 
@@ -157,11 +167,15 @@ int main(int argc, char **argv) {
       printf("Running sequential version\n");
     }
 
-    start = clock();
+    timer.c_start = clock();
+    clock_gettime(CLOCK_MONOTONIC, &timer.t_start);
+    gettimeofday(&timer.v_start, NULL);
 
     estimate = monte_carlo_integrate(target_function.f, static_samples, size);
 
-    end = clock();
+    timer.c_end = clock();
+    clock_gettime(CLOCK_MONOTONIC, &timer.t_end);
+    gettimeofday(&timer.v_end, NULL);
   } else {
     if (DEBUG) {
       printf("Running parallel version\n");
@@ -175,7 +189,9 @@ int main(int argc, char **argv) {
     base_data.results = results;
     base_data.samples = static_samples;
 
-    start = clock();
+    timer.c_start = clock();
+    clock_gettime(CLOCK_MONOTONIC, &timer.t_start);
+    gettimeofday(&timer.v_start, NULL);
 
     for (int i = 0; i < n_threads; i++) {
       long int left_boundary = i * (int)work_per_thread;
@@ -201,9 +217,12 @@ int main(int argc, char **argv) {
     }
 
     estimate = acc / n_threads;
-    end = clock();
 
-    if (DEBUG) {
+    timer.c_end = clock();
+    clock_gettime(CLOCK_MONOTONIC, &timer.t_end);
+    gettimeofday(&timer.v_end, NULL);
+
+    if (DEBUG && VERBOSE) {
       print_array(results, n_threads);
     }
   }
@@ -211,12 +230,22 @@ int main(int argc, char **argv) {
   if (DEBUG) {
     if (VERBOSE) {
       print_array(samples, size);
+      printf("Estimate: [%.33LF]\n", estimate);
     }
-    printf("Estimate: [%.33LF]\n", estimate);
+    printf(
+        "%.16LF, [%f, clock], [%f, clock_gettime], [%f, gettimeofday]\n",
+        estimate,
+        (double)(timer.c_end - timer.c_start) / (double)CLOCKS_PER_SEC,
+        (double)(timer.t_end.tv_sec - timer.t_start.tv_sec) +
+            (double)(timer.t_end.tv_nsec - timer.t_start.tv_nsec) /
+                1000000000.0,
+        (double)(timer.v_end.tv_sec - timer.v_start.tv_sec) +
+            (double)(timer.v_end.tv_usec - timer.v_start.tv_usec) / 1000000.0);
+  } else {
+    printf("%.16LF, %f\n", estimate,
+           (double)(timer.t_end.tv_sec - timer.t_start.tv_sec) +
+               (double)(timer.t_end.tv_nsec - timer.t_start.tv_nsec) /
+                   1000000000.0);
   }
-
-  double time_taken = (double)(end - start) / (double)CLOCKS_PER_SEC;
-
-  printf("%.16LF, %f\n", estimate, time_taken);
   return 0;
 }
