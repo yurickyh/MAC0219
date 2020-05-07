@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <pthread.h>
+
+#define NUM_THREADS 50
+// #define DEBUG
+
+#define MIN(a,b) ((a) < (b) ? a : b)
 
 double c_x_min;
 double c_x_max;
@@ -40,12 +46,65 @@ int colors[17][3] = {
                         {16, 16, 16},
                     };
 
-void allocate_image_buffer(){
-    int rgb_size = 3;
-    image_buffer = (unsigned char **) malloc(sizeof(unsigned char *) * image_buffer_size);
+// -------- THREAD DATA
 
-    for(int i = 0; i < image_buffer_size; i++){
+typedef struct {
+    int	thread_id;
+    int rgb_size;
+    int num_threads;
+} allocate_buffer_data;
+
+allocate_buffer_data *allocate_image_data_array;
+
+// -------- THREAD FUNCTIONS
+
+void *assign_image_buffer(void *args){
+    int thread_id, rgb_size, num_threads, work_by_thread;
+    allocate_buffer_data *my_data;
+
+    my_data = (allocate_buffer_data *) args;
+
+    thread_id = my_data->thread_id;
+    rgb_size = my_data->rgb_size;
+    num_threads = my_data->num_threads;
+
+    work_by_thread = image_buffer_size/num_threads + (image_buffer_size%num_threads != 0);
+
+    for (int i = thread_id*work_by_thread; i < i + work_by_thread && i < image_buffer_size; i++) {
+#ifdef DEBUG
+    printf("Thread %d: Allocating image_buffer in position %d\n", thread_id, i);
+#endif
         image_buffer[i] = (unsigned char *) malloc(sizeof(unsigned char) * rgb_size);
+    }
+
+    pthread_exit(NULL);
+};
+
+// -------- END THREAD DEFINITION
+
+void allocate_image_buffer(){
+    int effective_num_threads = MIN(NUM_THREADS, image_buffer_size); // decide the number of threads it will be used
+
+    pthread_t threads[effective_num_threads];
+    int error_code;
+
+    int rgb_size = 3;
+    
+    image_buffer = (unsigned char **) malloc(sizeof(unsigned char *) * image_buffer_size);
+    allocate_image_data_array = malloc(sizeof(allocate_buffer_data) * effective_num_threads);
+
+    for(int i = 0; i < effective_num_threads; i++){
+        allocate_image_data_array[i].thread_id = i;
+        allocate_image_data_array[i].rgb_size = rgb_size;
+        allocate_image_data_array[i].num_threads = effective_num_threads;
+#ifdef DEBUG
+        printf("Creating thread %d\n", i);
+#endif
+        error_code = pthread_create(&threads[i], NULL, assign_image_buffer, (void *) &allocate_image_data_array[i]);
+        if (error_code){
+            printf("ERROR; return code from pthread_create() is %d\n", error_code);
+            exit(-1);
+        };
     };
 };
 
