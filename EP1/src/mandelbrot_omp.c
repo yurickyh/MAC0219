@@ -1,4 +1,5 @@
 #include <math.h>
+#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -120,45 +121,53 @@ void compute_mandelbrot() {
   double c_x;
   double c_y;
 
-  for (i_y = 0; i_y < i_y_max; i_y++) {
-    c_y = c_y_min + i_y * pixel_height;
+#pragma omp parallel num_threads(32)                                          \
+    shared(image_buffer, iteration_max, pixel_width, pixel_height, i_y_max,   \
+           escape_radius_squared) private(i_y, i_x, iteration, c_y, c_x, z_x, \
+                                          z_y, z_x_squared, z_y_squared)
+  {
+#pragma omp for
+    for (i_y = 0; i_y < i_y_max; i_y++) {
+      c_y = c_y_min + i_y * pixel_height;
 
-    if (fabs(c_y) < pixel_height / 2) {
-      c_y = 0.0;
-    };
-
-    for (i_x = 0; i_x < i_x_max; i_x++) {
-      c_x = c_x_min + i_x * pixel_width;
-
-      z_x = 0.0;
-      z_y = 0.0;
-
-      z_x_squared = 0.0;
-      z_y_squared = 0.0;
-
-      for (iteration = 0; iteration < iteration_max &&
-                          ((z_x_squared + z_y_squared) < escape_radius_squared);
-           iteration++) {
-        z_y = 2 * z_x * z_y + c_y;
-        z_x = z_x_squared - z_y_squared + c_x;
-
-        z_x_squared = z_x * z_x;
-        z_y_squared = z_y * z_y;
+      if (fabs(c_y) < pixel_height / 2) {
+        c_y = 0.0;
       };
 
-      update_rgb_buffer(iteration, i_x, i_y);
-    };
-  };
+      for (i_x = 0; i_x < i_x_max; i_x++) {
+        c_x = c_x_min + i_x * pixel_width;
+
+        z_x = 0.0;
+        z_y = 0.0;
+
+        z_x_squared = 0.0;
+        z_y_squared = 0.0;
+
+        for (iteration = 0;
+             iteration < iteration_max &&
+             ((z_x_squared + z_y_squared) < escape_radius_squared);
+             iteration++) {
+          z_y = 2 * z_x * z_y + c_y;
+          z_x = z_x_squared - z_y_squared + c_x;
+
+          z_x_squared = z_x * z_x;
+          z_y_squared = z_y * z_y;
+        }
+
+        // update_rgb_buffer(iteration, i_x, i_y);
+      }
+    }
+  }
 };
 
 int main(int argc, char *argv[]) {
   init(argc, argv);
 
-  allocate_image_buffer();
+  // allocate_image_buffer();
 
   compute_mandelbrot();
 
-  write_to_file();
+  // write_to_file();
 
   return 0;
 };
