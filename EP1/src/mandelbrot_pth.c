@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define NUM_THREADS 50
+#define NUM_THREADS 6
 
 double c_x_min;
 double c_x_max;
@@ -33,6 +33,8 @@ int colors[17][3] = {
 
 // THREAD VARIABLES
 
+int num_threads;
+
 struct thread_data{
     int	thread_id;
     int work_by_thread;
@@ -44,29 +46,54 @@ struct thread_data thread_data_array[NUM_THREADS];
 
 // THREAD FUNCTIONS
 
-void *compute_mandelbrot_thread(void *threadarg){
-    int thread_id, work_by_thread, first_buffer_position;
+void update_rgb_buffer(int iteration, int x, int y) {
+    int color;
+
+    if (iteration == iteration_max) {
+        image_buffer[(i_y_max * y) + x][0] = colors[gradient_size][0];
+        image_buffer[(i_y_max * y) + x][1] = colors[gradient_size][1];
+        image_buffer[(i_y_max * y) + x][2] = colors[gradient_size][2];
+    }
+    else {
+        color = iteration % gradient_size;
+
+        image_buffer[(i_y_max * y) + x][0] = colors[color][0];
+        image_buffer[(i_y_max * y) + x][1] = colors[color][1];
+        image_buffer[(i_y_max * y) + x][2] = colors[color][2];
+    };
+};
+
+void *compute_mandelbrot_thread(void *threadarg) {
+    int work_by_thread, first_buffer_position, work_this_thread;
+    long thread_id;
+
     struct thread_data *my_data;
 
     my_data = (struct thread_data *) threadarg;
-    thread_id = my_data->thread_id;
+    thread_id = (long) my_data->thread_id;
     work_by_thread = my_data->work_by_thread;
-    
-    first_buffer_position = thread_id*work_by_thread;
 
-    for(int i = 0; i < work_by_thread; i++){
+    first_buffer_position = thread_id * work_by_thread;
+    
+    if (thread_id == (num_threads - 1)) {
+        work_this_thread = work_by_thread + (image_buffer_size % num_threads);
+    } else {
+        work_this_thread = work_by_thread;
+    }
+
+    for (int i = 0; i < work_this_thread; i++){
         int iteration;
         int buffer_position = first_buffer_position + i;
 
         int i_y = buffer_position / i_y_max;
         int i_x = buffer_position % i_x_max;
 
-        int c_y = c_y_min + i_y * pixel_height;
-        if(fabs(c_y) < pixel_height / 2){
+        double c_y = c_y_min + i_y * pixel_height;
+        if (fabs(c_y) < pixel_height / 2){
             c_y = 0.0;
         };
 
-        int c_x = c_x_min + i_x * pixel_width;
+        double c_x = c_x_min + i_x * pixel_width;
 
         double z_x = 0.0;
         double z_y = 0.0;
@@ -76,12 +103,12 @@ void *compute_mandelbrot_thread(void *threadarg){
 
         double escape_radius_squared = 4;
 
-        for(iteration = 0;
+        for (iteration = 0;
             iteration < iteration_max && \
             ((z_x_squared + z_y_squared) < escape_radius_squared);
             iteration++){
-            z_y         = 2 * z_x * z_y + c_y;
-            z_x         = z_x_squared - z_y_squared + c_x;
+            z_y = 2 * z_x * z_y + c_y;
+            z_x = z_x_squared - z_y_squared + c_x;
 
             z_x_squared = z_x * z_x;
             z_y_squared = z_y * z_y;
@@ -100,14 +127,13 @@ void allocate_image_buffer(){
     int rgb_size = 3;
     image_buffer = (unsigned char **) malloc(sizeof(unsigned char *) * image_buffer_size);
 
-    for(int i = 0; i < image_buffer_size; i++){
+    for (int i = 0; i < image_buffer_size; i++){
         image_buffer[i] = (unsigned char *) malloc(sizeof(unsigned char) * rgb_size);
     };
-  };
 };
 
 void init(int argc, char *argv[]){
-    if(argc < 6){
+    if (argc < 6){
         printf("usage: ./mandelbrot_seq c_x_min c_x_max c_y_min c_y_max image_size\n");
         printf("examples with image_size = 11500:\n");
         printf("    Full Picture:         ./mandelbrot_seq -2.5 1.5 -2.0 2.0 11500\n");
@@ -116,128 +142,87 @@ void init(int argc, char *argv[]){
         printf("    Triple Spiral Valley: ./mandelbrot_seq -0.188 -0.012 0.554 0.754 11500\n");
         exit(0);
     }
-    else{
+    else {
         sscanf(argv[1], "%lf", &c_x_min);
         sscanf(argv[2], "%lf", &c_x_max);
         sscanf(argv[3], "%lf", &c_y_min);
         sscanf(argv[4], "%lf", &c_y_max);
         sscanf(argv[5], "%d", &image_size);
 
-        i_x_max           = image_size;
-        i_y_max           = image_size;
+        i_x_max = image_size;
+        i_y_max = image_size;
         image_buffer_size = image_size * image_size;
 
-        pixel_width       = (c_x_max - c_x_min) / i_x_max;
-        pixel_height      = (c_y_max - c_y_min) / i_y_max;
+        pixel_width = (c_x_max - c_x_min) / i_x_max;
+        pixel_height = (c_y_max - c_y_min) / i_y_max;
     };
 };
 
-void update_rgb_buffer(int iteration, int x, int y) {
-  int color;
+void write_to_file(){
+    FILE *file;
+    char *filename = "output.ppm";
+    char *comment  = "# ";
 
-  if (iteration == iteration_max) {
-    image_buffer[(i_y_max * y) + x][0] = colors[gradient_size][0];
-    image_buffer[(i_y_max * y) + x][1] = colors[gradient_size][1];
-    image_buffer[(i_y_max * y) + x][2] = colors[gradient_size][2];
-  } else {
-    color = iteration % gradient_size;
+    int max_color_component_value = 255;
 
-    image_buffer[(i_y_max * y) + x][0] = colors[color][0];
-    image_buffer[(i_y_max * y) + x][1] = colors[color][1];
-    image_buffer[(i_y_max * y) + x][2] = colors[color][2];
-  };
-};
+    file = fopen(filename, "wb");
 
-void write_to_file() {
-  FILE *file;
-  char *filename = "output.ppm";
-  char *comment = "# ";
+    fprintf(file, "P6\n %s\n %d\n %d\n %d\n", comment, i_x_max, i_y_max,
+            max_color_component_value);
 
-  int max_color_component_value = 255;
-
-  file = fopen(filename, "wb");
-
-  fprintf(file, "P6\n %s\n %d\n %d\n %d\n", comment, i_x_max, i_y_max,
-          max_color_component_value);
-
-  for (int i = 0; i < image_buffer_size; i++) {
-    fwrite(image_buffer[i], 1, 3, file);
-  };
+    for (int i = 0; i < image_buffer_size; i++){
+        fwrite(image_buffer[i], 1 , 3, file);
+    };
 
   fclose(file);
 };
 
 void compute_mandelbrot(){
     // THREAD DEFINITIONS
-    int num_threads = NUM_THREADS;
+    if (NUM_THREADS > image_buffer_size) {
+        num_threads = image_buffer_size;
+    } else {
+        num_threads = NUM_THREADS;
+    }
+
     int work_by_thread = image_buffer_size / num_threads;
 
-    pthread_t thread[NUM_THREADS];
+    pthread_t thread[num_threads];
+    pthread_attr_t attr;
 
     int error_code;
     long t;
     void *status;
 
-    if(image_buffer_size < num_threads){
+    // // Initialize the attr variable
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+    if (image_buffer_size < num_threads){
         num_threads = image_buffer_size;
     }
 
     // Define pthread routine
-    for(t = 0; t < num_threads; t++){
+    for (t = 0; t < num_threads; t++){
         thread_data_array[t].thread_id = t;
         thread_data_array[t].work_by_thread = work_by_thread;
 
-        error_code = pthread_create(&thread[t], NULL, compute_mandelbrot_thread, (void *) &thread_data_array[t]);
+        error_code = pthread_create(&thread[t], &attr, compute_mandelbrot_thread, (void *) &thread_data_array[t]);
         if (error_code){
             printf("ERROR; return code from pthread_create() is %d\n", error_code);
             exit(-1);
         }
     }
 
+    pthread_attr_destroy(&attr);
 
-
-    // // THREAD DEFINITIONS
-    // int num_threads = NUM_THREADS;
-    // int work_by_thread = image_buffer_size / num_threads;
-
-    // pthread_t thread[NUM_THREADS];
-    // pthread_attr_t attr;
-
-    // int error_code;
-    // long t;
-    // void *status;
-
-    // // Initialize the attr variable
-    // pthread_attr_init(&attr);
-    // pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
-    // if(image_buffer_size < num_threads){
-    //     num_threads = image_buffer_size;
-    // }
-
-    // // Define pthread routine
-    // for(t = 0; t < num_threads; t++){
-    //     thread_data_array[t].thread_id = t;
-    //     thread_data_array[t].work_by_thread = work_by_thread;
-
-    //     error_code = pthread_create(&thread[t], &attr, compute_mandelbrot_thread, (void *) &thread_data_array[t]);
-    //     if (error_code){
-    //         printf("ERROR; return code from pthread_create() is %d\n", error_code);
-    //         exit(-1);
-    //     }
-    // }
-
-    // pthread_attr_destroy(&attr);
-
-    // for(t = 0; t < num_threads; t++){
-    //     error_code = pthread_join(thread[t], &status);
-    //     if (error_code){
-    //         printf("ERROR; return code from pthread_join() is %d\n", error_code);
-    //         exit(-1);
-    //     };
-    // };
-
-    pthread_exit(NULL);
+    for (t = 0; t < num_threads; t++){
+        error_code = pthread_join(thread[t], &status);
+        if (error_code){
+            printf("ERROR; return code from pthread_join() is %d\n", error_code);
+            exit(-1);
+        };
+    };
 };
 
 int main(int argc, char *argv[]) {
