@@ -4,3 +4,8 @@
 *.o
 *.out
 monte_carlo
+
+# EP01
+mandelbrot_omp
+mandelbrot_pth
+mandelbrot_seq
