@@ -21,6 +21,7 @@ unsigned char **image_buffer;
 int i_x_max;
 int i_y_max;
 int image_buffer_size;
+int num_desired_threads;
 
 int gradient_size = 16;
 int colors[17][3] = {
@@ -40,28 +41,11 @@ struct thread_data{
     int work_by_thread;
 };
 
-struct thread_data thread_data_array[NUM_THREADS];
+// struct thread_data thread_data_array[num_desired_threads];
 
 // END THREAD VARIABLES
 
 // THREAD FUNCTIONS
-
-void update_rgb_buffer(int iteration, int x, int y) {
-    int color;
-
-    if (iteration == iteration_max) {
-        image_buffer[(i_y_max * y) + x][0] = colors[gradient_size][0];
-        image_buffer[(i_y_max * y) + x][1] = colors[gradient_size][1];
-        image_buffer[(i_y_max * y) + x][2] = colors[gradient_size][2];
-    }
-    else {
-        color = iteration % gradient_size;
-
-        image_buffer[(i_y_max * y) + x][0] = colors[color][0];
-        image_buffer[(i_y_max * y) + x][1] = colors[color][1];
-        image_buffer[(i_y_max * y) + x][2] = colors[color][2];
-    };
-};
 
 void *compute_mandelbrot_thread(void *threadarg) {
     int work_by_thread, first_buffer_position, work_this_thread;
@@ -113,8 +97,6 @@ void *compute_mandelbrot_thread(void *threadarg) {
             z_x_squared = z_x * z_x;
             z_y_squared = z_y * z_y;
         };
-
-        update_rgb_buffer(iteration, i_x, i_y);
     }
 
     pthread_exit((void*) thread_id);
@@ -122,24 +104,15 @@ void *compute_mandelbrot_thread(void *threadarg) {
 
 // END THREAD FUNCTIONS
 
-
-void allocate_image_buffer(){
-    int rgb_size = 3;
-    image_buffer = (unsigned char **) malloc(sizeof(unsigned char *) * image_buffer_size);
-
-    for (int i = 0; i < image_buffer_size; i++){
-        image_buffer[i] = (unsigned char *) malloc(sizeof(unsigned char) * rgb_size);
-    };
-};
-
 void init(int argc, char *argv[]){
     if (argc < 6){
-        printf("usage: ./mandelbrot_seq c_x_min c_x_max c_y_min c_y_max image_size\n");
+        printf("usage: ./mandelbrot_seq c_x_min c_x_max c_y_min c_y_max image_size "
+            "num_desired_threads\n");
         printf("examples with image_size = 11500:\n");
-        printf("    Full Picture:         ./mandelbrot_seq -2.5 1.5 -2.0 2.0 11500\n");
-        printf("    Seahorse Valley:      ./mandelbrot_seq -0.8 -0.7 0.05 0.15 11500\n");
-        printf("    Elephant Valley:      ./mandelbrot_seq 0.175 0.375 -0.1 0.1 11500\n");
-        printf("    Triple Spiral Valley: ./mandelbrot_seq -0.188 -0.012 0.554 0.754 11500\n");
+        printf("    Full Picture:         ./mandelbrot_seq -2.5 1.5 -2.0 2.0 11500 32\n");
+        printf("    Seahorse Valley:      ./mandelbrot_seq -0.8 -0.7 0.05 0.15 11500 32\n");
+        printf("    Elephant Valley:      ./mandelbrot_seq 0.175 0.375 -0.1 0.1 11500 32\n");
+        printf("    Triple Spiral Valley: ./mandelbrot_seq -0.188 -0.012 0.554 0.754 11500 32\n");
         exit(0);
     }
     else {
@@ -148,6 +121,7 @@ void init(int argc, char *argv[]){
         sscanf(argv[3], "%lf", &c_y_min);
         sscanf(argv[4], "%lf", &c_y_max);
         sscanf(argv[5], "%d", &image_size);
+        sscanf(argv[6], "%d", &num_desired_threads);
 
         i_x_max = image_size;
         i_y_max = image_size;
@@ -158,34 +132,16 @@ void init(int argc, char *argv[]){
     };
 };
 
-void write_to_file(){
-    FILE *file;
-    char *filename = "output.ppm";
-    char *comment  = "# ";
-
-    int max_color_component_value = 255;
-
-    file = fopen(filename, "wb");
-
-    fprintf(file, "P6\n %s\n %d\n %d\n %d\n", comment, i_x_max, i_y_max,
-            max_color_component_value);
-
-    for (int i = 0; i < image_buffer_size; i++){
-        fwrite(image_buffer[i], 1 , 3, file);
-    };
-
-  fclose(file);
-};
-
 void compute_mandelbrot(){
     // THREAD DEFINITIONS
-    if (NUM_THREADS > image_buffer_size) {
+    if (num_desired_threads > image_buffer_size) {
         num_threads = image_buffer_size;
     } else {
-        num_threads = NUM_THREADS;
+        num_threads = num_desired_threads;
     }
 
     int work_by_thread = image_buffer_size / num_threads;
+    struct thread_data thread_data_array[num_desired_threads];
 
     pthread_t thread[num_threads];
     pthread_attr_t attr;
@@ -228,11 +184,7 @@ void compute_mandelbrot(){
 int main(int argc, char *argv[]) {
   init(argc, argv);
 
-  allocate_image_buffer();
-
   compute_mandelbrot();
-
-  write_to_file();
 
   return 0;
 };
