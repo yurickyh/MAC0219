@@ -19,6 +19,7 @@ unsigned char **image_buffer;
 int i_x_max;
 int i_y_max;
 int image_buffer_size;
+int num_desired_threads;
 
 int gradient_size = 16;
 int colors[17][3] = {
@@ -40,21 +41,23 @@ void allocate_image_buffer() {
 };
 
 void init(int argc, char *argv[]) {
-  if (argc < 6) {
+  if (argc < 7) {
     printf(
-        "usage: ./mandelbrot_omp c_x_min c_x_max c_y_min c_y_max image_size\n");
+        "usage: ./mandelbrot_omp c_x_min c_x_max c_y_min c_y_max image_size "
+        "num_desired_threads\n");
     printf("examples with image_size = 11500:\n");
     printf(
-        "    Full Picture:         ./mandelbrot_omp -2.5 1.5 -2.0 2.0 11500\n");
+        "    Full Picture:         ./mandelbrot_omp -2.5 1.5 -2.0 2.0 11500 "
+        "32\n");
     printf(
         "    Seahorse Valley:      ./mandelbrot_omp -0.8 -0.7 0.05 0.15 "
-        "11500\n");
+        "11500 32\n");
     printf(
         "    Elephant Valley:      ./mandelbrot_omp 0.175 0.375 -0.1 0.1 "
-        "11500\n");
+        "11500 32\n");
     printf(
         "    Triple Spiral Valley: ./mandelbrot_omp -0.188 -0.012 0.554 0.754 "
-        "11500\n");
+        "11500 32\n");
     exit(0);
   } else {
     sscanf(argv[1], "%lf", &c_x_min);
@@ -62,6 +65,7 @@ void init(int argc, char *argv[]) {
     sscanf(argv[3], "%lf", &c_y_min);
     sscanf(argv[4], "%lf", &c_y_max);
     sscanf(argv[5], "%d", &image_size);
+    sscanf(argv[6], "%d", &num_desired_threads);
 
     i_x_max = image_size;
     i_y_max = image_size;
@@ -121,7 +125,7 @@ void compute_mandelbrot() {
   double c_x;
   double c_y;
 
-#pragma omp parallel num_threads(32)                                          \
+#pragma omp parallel num_threads(num_desired_threads)                         \
     shared(image_buffer, iteration_max, pixel_width, pixel_height, i_y_max,   \
            escape_radius_squared) private(i_y, i_x, iteration, c_y, c_x, z_x, \
                                           z_y, z_x_squared, z_y_squared)
