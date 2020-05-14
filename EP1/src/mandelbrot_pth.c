@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define NUM_THREADS 6
-
 double c_x_min;
 double c_x_max;
 double c_y_min;
@@ -35,12 +33,12 @@ int colors[17][3] = {
 
 int num_threads;
 
-struct thread_data{
+typedef struct {
     int	thread_id;
     int work_by_thread;
-};
+} thread_data;
 
-struct thread_data thread_data_array[NUM_THREADS];
+thread_data *thread_data_array;
 
 // END THREAD VARIABLES
 
@@ -67,9 +65,9 @@ void *compute_mandelbrot_thread(void *threadarg) {
     int work_by_thread, first_buffer_position, work_this_thread;
     long thread_id;
 
-    struct thread_data *my_data;
+    thread_data *my_data;
 
-    my_data = (struct thread_data *) threadarg;
+    my_data = (thread_data *) threadarg;
     thread_id = (long) my_data->thread_id;
     work_by_thread = my_data->work_by_thread;
 
@@ -133,13 +131,13 @@ void allocate_image_buffer(){
 };
 
 void init(int argc, char *argv[]){
-    if (argc < 6){
-        printf("usage: ./mandelbrot_seq c_x_min c_x_max c_y_min c_y_max image_size\n");
-        printf("examples with image_size = 11500:\n");
-        printf("    Full Picture:         ./mandelbrot_seq -2.5 1.5 -2.0 2.0 11500\n");
-        printf("    Seahorse Valley:      ./mandelbrot_seq -0.8 -0.7 0.05 0.15 11500\n");
-        printf("    Elephant Valley:      ./mandelbrot_seq 0.175 0.375 -0.1 0.1 11500\n");
-        printf("    Triple Spiral Valley: ./mandelbrot_seq -0.188 -0.012 0.554 0.754 11500\n");
+    if (argc < 7){
+        printf("usage: ./mandelbrot_seq c_x_min c_x_max c_y_min c_y_max image_size num_threads\n");
+        printf("examples with image_size = 11500 and num_threads = 5:\n");
+        printf("    Full Picture:         ./mandelbrot_seq -2.5 1.5 -2.0 2.0 11500 5\n");
+        printf("    Seahorse Valley:      ./mandelbrot_seq -0.8 -0.7 0.05 0.15 11500 5\n");
+        printf("    Elephant Valley:      ./mandelbrot_seq 0.175 0.375 -0.1 0.1 11500 5\n");
+        printf("    Triple Spiral Valley: ./mandelbrot_seq -0.188 -0.012 0.554 0.754 11500 5\n");
         exit(0);
     }
     else {
@@ -148,6 +146,7 @@ void init(int argc, char *argv[]){
         sscanf(argv[3], "%lf", &c_y_min);
         sscanf(argv[4], "%lf", &c_y_max);
         sscanf(argv[5], "%d", &image_size);
+        sscanf(argv[6], "%d", &num_threads);
 
         i_x_max = image_size;
         i_y_max = image_size;
@@ -179,10 +178,8 @@ void write_to_file(){
 
 void compute_mandelbrot(){
     // THREAD DEFINITIONS
-    if (NUM_THREADS > image_buffer_size) {
+    if (num_threads > image_buffer_size) {
         num_threads = image_buffer_size;
-    } else {
-        num_threads = NUM_THREADS;
     }
 
     int work_by_thread = image_buffer_size / num_threads;
@@ -195,6 +192,7 @@ void compute_mandelbrot(){
     void *status;
 
     // // Initialize the attr variable
+    thread_data_array = malloc(num_threads * sizeof(thread_data));
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
