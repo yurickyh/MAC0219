@@ -65,29 +65,37 @@ void *compute_mandelbrot_thread(void *threadarg) {
     int work_by_thread, first_buffer_position, work_this_thread;
     long thread_id;
 
+    // EXTRACT DATA FROM THREAD_DATA
     thread_data *my_data;
 
     my_data = (thread_data *) threadarg;
     thread_id = (long) my_data->thread_id;
     work_by_thread = my_data->work_by_thread;
 
+    // INITIALIZE VARIABLES FOR THREAD
+    // Define the first position in the buffer the thread will work
     first_buffer_position = thread_id * work_by_thread;
     
+    // As there are equally division of work, some of the final positions of image_buffer
+    //   may not be filled up, so this job is assigned to the last thread
     if (thread_id == (num_threads - 1)) {
         work_this_thread = work_by_thread + (image_buffer_size % num_threads);
     } else {
         work_this_thread = work_by_thread;
     }
 
-    for (int i = 0; i < work_this_thread; i++){
+    // FILL UP IMAGE_BUFFER
+    // Each thread will work from first_buffer_position to first_buffer_position + work_this_thread - 1
+    for (int i = 0; i < work_this_thread; i++) {
         int iteration;
-        int buffer_position = first_buffer_position + i;
 
+        // Define the indices according to current buffer position
+        int buffer_position = first_buffer_position + i;
         int i_y = buffer_position / i_y_max;
         int i_x = buffer_position % i_x_max;
 
         double c_y = c_y_min + i_y * pixel_height;
-        if (fabs(c_y) < pixel_height / 2){
+        if (fabs(c_y) < pixel_height / 2) {
             c_y = 0.0;
         };
 
@@ -104,7 +112,7 @@ void *compute_mandelbrot_thread(void *threadarg) {
         for (iteration = 0;
             iteration < iteration_max && \
             ((z_x_squared + z_y_squared) < escape_radius_squared);
-            iteration++){
+            iteration++) {
             z_y = 2 * z_x * z_y + c_y;
             z_x = z_x_squared - z_y_squared + c_x;
 
@@ -121,16 +129,16 @@ void *compute_mandelbrot_thread(void *threadarg) {
 // END THREAD FUNCTIONS
 
 
-void allocate_image_buffer(){
+void allocate_image_buffer() {
     int rgb_size = 3;
     image_buffer = (unsigned char **) malloc(sizeof(unsigned char *) * image_buffer_size);
 
-    for (int i = 0; i < image_buffer_size; i++){
+    for (int i = 0; i < image_buffer_size; i++) {
         image_buffer[i] = (unsigned char *) malloc(sizeof(unsigned char) * rgb_size);
     };
 };
 
-void init(int argc, char *argv[]){
+void init(int argc, char *argv[]) {
     if (argc < 7){
         printf("usage: ./mandelbrot_seq c_x_min c_x_max c_y_min c_y_max image_size num_threads\n");
         printf("examples with image_size = 11500 and num_threads = 5:\n");
@@ -139,8 +147,7 @@ void init(int argc, char *argv[]){
         printf("    Elephant Valley:      ./mandelbrot_seq 0.175 0.375 -0.1 0.1 11500 5\n");
         printf("    Triple Spiral Valley: ./mandelbrot_seq -0.188 -0.012 0.554 0.754 11500 5\n");
         exit(0);
-    }
-    else {
+    } else {
         sscanf(argv[1], "%lf", &c_x_min);
         sscanf(argv[2], "%lf", &c_x_max);
         sscanf(argv[3], "%lf", &c_y_min);
@@ -157,7 +164,7 @@ void init(int argc, char *argv[]){
     };
 };
 
-void write_to_file(){
+void write_to_file() {
     FILE *file;
     char *filename = "output.ppm";
     char *comment  = "# ";
@@ -169,42 +176,39 @@ void write_to_file(){
     fprintf(file, "P6\n %s\n %d\n %d\n %d\n", comment, i_x_max, i_y_max,
             max_color_component_value);
 
-    for (int i = 0; i < image_buffer_size; i++){
+    for (int i = 0; i < image_buffer_size; i++) {
         fwrite(image_buffer[i], 1 , 3, file);
     };
 
-  fclose(file);
+    fclose(file);
 };
 
-void compute_mandelbrot(){
+void compute_mandelbrot() {
     // THREAD DEFINITIONS
-    if (num_threads > image_buffer_size) {
-        num_threads = image_buffer_size;
-    }
-
-    int work_by_thread = image_buffer_size / num_threads;
-
     pthread_t thread[num_threads];
     pthread_attr_t attr;
-
-    int error_code;
+    int error_code, work_by_thread;
     long t;
     void *status;
 
-    // // Initialize the attr variable
+    // INITIALIZE THREADS VARIABLES
+    work_by_thread = image_buffer_size / num_threads;
     thread_data_array = malloc(num_threads * sizeof(thread_data));
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-    if (image_buffer_size < num_threads){
+    // The number of threads cannot be greater than the image size
+    if (image_buffer_size < num_threads) {
         num_threads = image_buffer_size;
     }
 
-    // Define pthread routine
-    for (t = 0; t < num_threads; t++){
+    // ASSIGN WORK FOR EACH THREADS
+    for (t = 0; t < num_threads; t++) {
+        // INITIALIZE THREAD DATA
         thread_data_array[t].thread_id = t;
         thread_data_array[t].work_by_thread = work_by_thread;
 
+        // CREATE THREAD
         error_code = pthread_create(&thread[t], &attr, compute_mandelbrot_thread, (void *) &thread_data_array[t]);
         if (error_code){
             printf("ERROR; return code from pthread_create() is %d\n", error_code);
@@ -212,11 +216,12 @@ void compute_mandelbrot(){
         }
     }
 
+    // JOIN THREADS
     pthread_attr_destroy(&attr);
 
     for (t = 0; t < num_threads; t++){
         error_code = pthread_join(thread[t], &status);
-        if (error_code){
+        if (error_code) {
             printf("ERROR; return code from pthread_join() is %d\n", error_code);
             exit(-1);
         };
