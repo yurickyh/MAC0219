@@ -31,18 +31,18 @@ int colors[17][3] = {
 void init(int argc, char *argv[]) {
   if (argc < 6) {
     printf(
-        "usage: ./mandelbrot_seq c_x_min c_x_max c_y_min c_y_max image_size\n");
+        "usage: ./mandelbrot_seq_sem c_x_min c_x_max c_y_min c_y_max image_size\n");
     printf("examples with image_size = 11500:\n");
     printf(
-        "    Full Picture:         ./mandelbrot_seq -2.5 1.5 -2.0 2.0 11500\n");
+        "    Full Picture:         ./mandelbrot_seq_sem -2.5 1.5 -2.0 2.0 11500\n");
     printf(
-        "    Seahorse Valley:      ./mandelbrot_seq -0.8 -0.7 0.05 0.15 "
+        "    Seahorse Valley:      ./mandelbrot_seq_sem -0.8 -0.7 0.05 0.15 "
         "11500\n");
     printf(
-        "    Elephant Valley:      ./mandelbrot_seq 0.175 0.375 -0.1 0.1 "
+        "    Elephant Valley:      ./mandelbrot_seq_sem 0.175 0.375 -0.1 0.1 "
         "11500\n");
     printf(
-        "    Triple Spiral Valley: ./mandelbrot_seq -0.188 -0.012 0.554 0.754 "
+        "    Triple Spiral Valley: ./mandelbrot_seq_sem -0.188 -0.012 0.554 0.754 "
         "11500\n");
     exit(0);
   } else {
