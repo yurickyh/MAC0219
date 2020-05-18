@@ -52,5 +52,4 @@ for NAME in ${NAMES2[@]}; do
     SIZE=$INITIAL_SIZE
 
     mv *.log results/$NAME
-    rm output.ppm
 done
