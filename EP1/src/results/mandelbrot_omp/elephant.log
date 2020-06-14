@@ -1,0 +1,300 @@
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 16 1' (10 runs):
+
+       0,000936889 seconds time elapsed                                          ( +-  2,30% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 16 2' (10 runs):
+
+       0,001334948 seconds time elapsed                                          ( +- 15,99% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 16 4' (10 runs):
+
+       0,001171547 seconds time elapsed                                          ( +- 27,16% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 16 8' (10 runs):
+
+       0,002137697 seconds time elapsed                                          ( +- 35,64% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 16 16' (10 runs):
+
+       0,001689824 seconds time elapsed                                          ( +- 16,98% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 16 32' (10 runs):
+
+       0,001556509 seconds time elapsed                                          ( +-  2,00% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 32 1' (10 runs):
+
+       0,001905375 seconds time elapsed                                          ( +-  1,62% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 32 2' (10 runs):
+
+       0,001557956 seconds time elapsed                                          ( +-  3,69% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 32 4' (10 runs):
+
+       0,003880133 seconds time elapsed                                          ( +- 35,20% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 32 8' (10 runs):
+
+       0,001538349 seconds time elapsed                                          ( +-  4,84% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 32 16' (10 runs):
+
+       0,001668731 seconds time elapsed                                          ( +-  2,34% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 32 32' (10 runs):
+
+       0,002274185 seconds time elapsed                                          ( +-  2,58% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 64 1' (10 runs):
+
+       0,005512748 seconds time elapsed                                          ( +-  0,43% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 64 2' (10 runs):
+
+       0,003237835 seconds time elapsed                                          ( +-  0,89% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 64 4' (10 runs):
+
+       0,005474555 seconds time elapsed                                          ( +- 30,87% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 64 8' (10 runs):
+
+       0,003330300 seconds time elapsed                                          ( +-  5,02% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 64 16' (10 runs):
+
+       0,004145155 seconds time elapsed                                          ( +-  9,77% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 64 32' (10 runs):
+
+       0,004232036 seconds time elapsed                                          ( +-  8,47% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 128 1' (10 runs):
+
+       0,019938647 seconds time elapsed                                          ( +-  0,67% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 128 2' (10 runs):
+
+       0,010783481 seconds time elapsed                                          ( +-  0,63% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 128 4' (10 runs):
+
+       0,008198256 seconds time elapsed                                          ( +-  5,13% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 128 8' (10 runs):
+
+       0,009120706 seconds time elapsed                                          ( +-  3,86% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 128 16' (10 runs):
+
+       0,008942699 seconds time elapsed                                          ( +-  3,90% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 128 32' (10 runs):
+
+       0,008831796 seconds time elapsed                                          ( +-  4,03% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 256 1' (10 runs):
+
+       0,076589626 seconds time elapsed                                          ( +-  0,14% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 256 2' (10 runs):
+
+       0,039863143 seconds time elapsed                                          ( +-  0,61% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 256 4' (10 runs):
+
+       0,028917755 seconds time elapsed                                          ( +-  2,05% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 256 8' (10 runs):
+
+       0,029101642 seconds time elapsed                                          ( +-  2,14% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 256 16' (10 runs):
+
+       0,029235062 seconds time elapsed                                          ( +-  3,13% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 256 32' (10 runs):
+
+       0,028286973 seconds time elapsed                                          ( +-  1,53% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 512 1' (10 runs):
+
+       0,302483928 seconds time elapsed                                          ( +-  0,17% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 512 2' (10 runs):
+
+       0,155936588 seconds time elapsed                                          ( +-  0,08% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 512 4' (10 runs):
+
+       0,110955544 seconds time elapsed                                          ( +-  1,23% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 512 8' (10 runs):
+
+       0,110418997 seconds time elapsed                                          ( +-  1,54% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 512 16' (10 runs):
+
+       0,106234203 seconds time elapsed                                          ( +-  1,09% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 512 32' (10 runs):
+
+       0,107106250 seconds time elapsed                                          ( +-  1,00% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 1024 1' (10 runs):
+
+       1,205983686 seconds time elapsed                                          ( +-  0,09% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 1024 2' (10 runs):
+
+       0,621023918 seconds time elapsed                                          ( +-  0,17% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 1024 4' (10 runs):
+
+       0,420609812 seconds time elapsed                                          ( +-  0,70% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 1024 8' (10 runs):
+
+       0,411970478 seconds time elapsed                                          ( +-  0,68% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 1024 16' (10 runs):
+
+       0,404487938 seconds time elapsed                                          ( +-  0,48% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 1024 32' (10 runs):
+
+       0,398473088 seconds time elapsed                                          ( +-  0,21% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 2048 1' (10 runs):
+
+       4,815202081 seconds time elapsed                                          ( +-  0,05% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 2048 2' (10 runs):
+
+       2,476154865 seconds time elapsed                                          ( +-  0,02% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 2048 4' (10 runs):
+
+       1,674579012 seconds time elapsed                                          ( +-  0,80% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 2048 8' (10 runs):
+
+       1,664691774 seconds time elapsed                                          ( +-  1,07% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 2048 16' (10 runs):
+
+       1,612597873 seconds time elapsed                                          ( +-  1,59% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 2048 32' (10 runs):
+
+       1,583710704 seconds time elapsed                                          ( +-  0,09% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 4096 1' (10 runs):
+
+      19,244757046 seconds time elapsed                                          ( +-  0,05% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 4096 2' (10 runs):
+
+       9,896312169 seconds time elapsed                                          ( +-  0,01% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 4096 4' (10 runs):
+
+       6,673857878 seconds time elapsed                                          ( +-  0,83% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 4096 8' (10 runs):
+
+       6,411613212 seconds time elapsed                                          ( +-  0,38% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 4096 16' (10 runs):
+
+       6,355379210 seconds time elapsed                                          ( +-  0,20% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 4096 32' (10 runs):
+
+       6,322346884 seconds time elapsed                                          ( +-  0,09% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 8192 1' (10 runs):
+
+      77,105369371 seconds time elapsed                                          ( +-  0,11% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 8192 2' (10 runs):
+
+      39,593442399 seconds time elapsed                                          ( +-  0,04% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 8192 4' (10 runs):
+
+      26,666189844 seconds time elapsed                                          ( +-  0,92% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 8192 8' (10 runs):
+
+      25,404197972 seconds time elapsed                                          ( +-  0,27% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 8192 16' (10 runs):
+
+      25,290750691 seconds time elapsed                                          ( +-  0,10% )
+
+
+ Performance counter stats for './mandelbrot_omp 0.175 0.375 -0.1 0.1 8192 32' (10 runs):
+
+      25,481126819 seconds time elapsed                                          ( +-  0,33% )
+

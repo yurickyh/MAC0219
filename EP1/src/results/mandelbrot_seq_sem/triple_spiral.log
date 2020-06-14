@@ -1,0 +1,50 @@
+
+ Performance counter stats for './mandelbrot_seq_sem -0.188 -0.012 0.554 0.754 16' (10 runs):
+
+       0,000897784 seconds time elapsed                                          ( +-  2,53% )
+
+
+ Performance counter stats for './mandelbrot_seq_sem -0.188 -0.012 0.554 0.754 32' (10 runs):
+
+       0,002064240 seconds time elapsed                                          ( +-  1,96% )
+
+
+ Performance counter stats for './mandelbrot_seq_sem -0.188 -0.012 0.554 0.754 64' (10 runs):
+
+       0,006358908 seconds time elapsed                                          ( +-  1,00% )
+
+
+ Performance counter stats for './mandelbrot_seq_sem -0.188 -0.012 0.554 0.754 128' (10 runs):
+
+       0,023517646 seconds time elapsed                                          ( +-  0,44% )
+
+
+ Performance counter stats for './mandelbrot_seq_sem -0.188 -0.012 0.554 0.754 256' (10 runs):
+
+       0,091429811 seconds time elapsed                                          ( +-  0,24% )
+
+
+ Performance counter stats for './mandelbrot_seq_sem -0.188 -0.012 0.554 0.754 512' (10 runs):
+
+       0,362594330 seconds time elapsed                                          ( +-  0,13% )
+
+
+ Performance counter stats for './mandelbrot_seq_sem -0.188 -0.012 0.554 0.754 1024' (10 runs):
+
+       1,443503724 seconds time elapsed                                          ( +-  0,04% )
+
+
+ Performance counter stats for './mandelbrot_seq_sem -0.188 -0.012 0.554 0.754 2048' (10 runs):
+
+       5,779933324 seconds time elapsed                                          ( +-  0,06% )
+
+
+ Performance counter stats for './mandelbrot_seq_sem -0.188 -0.012 0.554 0.754 4096' (10 runs):
+
+      23,110561391 seconds time elapsed                                          ( +-  0,03% )
+
+
+ Performance counter stats for './mandelbrot_seq_sem -0.188 -0.012 0.554 0.754 8192' (10 runs):
+
+      92,568699228 seconds time elapsed                                          ( +-  0,03% )
+
