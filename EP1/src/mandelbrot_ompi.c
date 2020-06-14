@@ -9,7 +9,8 @@
 
 int num_tasks;
 int task_id;
-char hostname[MPI_MAX_PROCESSOR_NAME];
+
+// ----------------------------------------------
 
 double c_x_min;
 double c_x_max;
@@ -147,16 +148,11 @@ int get_number_slaves()
   return (num_tasks - 1);
 }
 
-int get_work_amount(int work_by_task, int num_slaves)
+int get_work_amount(int task, int work_by_task, int num_slaves)
 {
-  if (task_id == num_slaves)
+  if (task == num_slaves)
     return work_by_task + (image_buffer_size % num_slaves);
   return work_by_task;
-}
-
-void create_struct()
-{
-  
 }
 
 void compute_mandelbrot()
@@ -165,12 +161,11 @@ void compute_mandelbrot()
   int num_slaves = get_number_slaves();
 
   int work_by_task = image_buffer_size / num_slaves;
-  int work_this_task = get_work_amount(work_by_task, num_slaves);
+  int work_this_task = get_work_amount(task_id, work_by_task, num_slaves);
 
-  rgb_data rgb_data_array[work_this_task];
+  rgb_data *rgb_data_array;
   MPI_Datatype rgb_data_type;
 
-  
   MPI_Datatype types[3] = {MPI_INT, MPI_INT, MPI_INT};
   int blockcounts[3] = {1, 1, 1};
   MPI_Aint offsets[3];
@@ -179,7 +174,6 @@ void compute_mandelbrot()
   offsets[1] = offsetof(rgb_data, y);
   offsets[2] = offsetof(rgb_data, iteration);
 
-  // Finally create the type.
   MPI_Type_create_struct(3, blockcounts, offsets, types, &rgb_data_type);
   MPI_Type_commit(&rgb_data_type);
 
@@ -193,28 +187,33 @@ void compute_mandelbrot()
     }
 
     for (int i = 1; i <= num_slaves; i++)
-    { 
-      MPI_Recv(rgb_data_array, work_this_task, rgb_data_type, i, 1, MPI_COMM_WORLD, &status);
+    {
+      int work_amount_task_i = get_work_amount(i, work_by_task, num_slaves);
+      rgb_data_array = malloc(work_amount_task_i * sizeof(rgb_data));
 
-      for (int j = 0; j < work_this_task; j++)
+      MPI_Recv(rgb_data_array, work_amount_task_i, rgb_data_type, i, 1, MPI_COMM_WORLD, &status);
+
+      for (int j = 0; j < work_amount_task_i; j++)
       {
         update_rgb_buffer(rgb_data_array[j].iteration, rgb_data_array[j].x, rgb_data_array[j].y);
       }
+
     }
 
     write_to_file();
   }
-  else
+  else if (task_id <= num_slaves)
   {
-    int dummy;
-    MPI_Recv(&dummy, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+    int this_task;
+    MPI_Recv(&this_task, 1, MPI_INT, MASTER, 0, MPI_COMM_WORLD, &status);
+
+    rgb_data_array = malloc(work_this_task * sizeof(rgb_data));
+
+    int first_buffer_position = (task_id - 1) * work_by_task;
 
     for (int i = 0; i < work_this_task; i++)
     {
-      int iteration;
-
       // Define the indices according to current buffer position
-      int first_buffer_position = (task_id - 1) * work_by_task;
       int buffer_position = first_buffer_position + i;
       int i_y = buffer_position / i_y_max;
       int i_x = buffer_position % i_x_max;
@@ -224,6 +223,8 @@ void compute_mandelbrot()
       {
         c_y = 0.0;
       };
+
+      int iteration;
 
       double c_x = c_x_min + i_x * pixel_width;
 
@@ -252,10 +253,55 @@ void compute_mandelbrot()
       rgb_data_array[i].iteration = iteration;
     }
 
-    MPI_Send(rgb_data_array, work_this_task, rgb_data_type, 0, 1, MPI_COMM_WORLD);
+    MPI_Send(rgb_data_array, work_this_task, rgb_data_type, MASTER, 1, MPI_COMM_WORLD);
   }
 
   MPI_Finalize();
+};
+
+void compute_mandelbrot_seq() {
+  double z_x;
+  double z_y;
+  double z_x_squared;
+  double z_y_squared;
+  double escape_radius_squared = 4;
+
+  int iteration;
+  int i_x;
+  int i_y;
+
+  double c_x;
+  double c_y;
+
+  for (i_y = 0; i_y < i_y_max; i_y++) {
+    c_y = c_y_min + i_y * pixel_height;
+
+    if (fabs(c_y) < pixel_height / 2) {
+      c_y = 0.0;
+    };
+
+    for (i_x = 0; i_x < i_x_max; i_x++) {
+      c_x = c_x_min + i_x * pixel_width;
+
+      z_x = 0.0;
+      z_y = 0.0;
+
+      z_x_squared = 0.0;
+      z_y_squared = 0.0;
+
+      for (iteration = 0; iteration < iteration_max &&
+                          ((z_x_squared + z_y_squared) < escape_radius_squared);
+           iteration++) {
+        z_y = 2 * z_x * z_y + c_y;
+        z_x = z_x_squared - z_y_squared + c_x;
+
+        z_x_squared = z_x * z_x;
+        z_y_squared = z_y * z_y;
+      };
+
+      update_rgb_buffer(iteration, i_x, i_y);
+    };
+  };
 };
 
 int main(int argc, char *argv[])
@@ -267,7 +313,13 @@ int main(int argc, char *argv[])
 
   init(argc, argv);
 
-  compute_mandelbrot();
+  if (num_tasks == 1) {
+    allocate_image_buffer();
+    compute_mandelbrot_seq();
+    write_to_file();
+  } else {
+    compute_mandelbrot();
+  }
 
   return 0;
 };
