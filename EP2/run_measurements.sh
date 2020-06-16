@@ -27,6 +27,6 @@ for NAME in ${NAMES2[@]}; do
         perf stat -r $MEASUREMENTS -n ./$NAME -0.188 -0.012 0.554 0.754 $SIZE $THREADS >> $NAME.log 2>&1
         THREADS=$(($THREADS * 2))
     done
-
+    THREADS=$INITIAL_THREADS
     mv *.log results
 done
