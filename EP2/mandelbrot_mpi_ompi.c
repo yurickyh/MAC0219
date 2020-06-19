@@ -98,7 +98,7 @@ void init(int argc, char *argv[])
 {
   if (argc < 7)
   {
-    printf("usage: ./mandelbrot_pth c_x_min c_x_max c_y_min c_y_max image_size num_threads\n");
+    printf("usage: ./mandelbrot_mpi_ompi c_x_min c_x_max c_y_min c_y_max image_size num_threads\n");
     printf("examples with image_size = 11500 and num_threads = 5:\n");
     printf("    Full Picture:         ./mandelbrot_pth -2.5 1.5 -2.0 2.0 11500 5\n");
     printf("    Seahorse Valley:      ./mandelbrot_pth -0.8 -0.7 0.05 0.15 11500 5\n");

@@ -24,6 +24,6 @@ for PROCESS in ${PROCESSES[@]}; do
         perf stat -r $MEASUREMENTS -n mpirun -H localhost:$PROCESS ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 $SIZE $THREADS >> mandelbrot_mpi_ompi.log 2>&1
         THREADS=$(($THREADS * 2))
     done
-    THREADS=$INITIAL_THREADS
-    mv *.log results
+    THREADS=$INITIAL_THREADS    
 done
+mv *.log results
