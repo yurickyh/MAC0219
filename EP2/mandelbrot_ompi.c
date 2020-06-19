@@ -94,12 +94,12 @@ void init(int argc, char *argv[])
 {
   if (argc < 6)
   {
-    printf("usage: ./mandelbrot_pth c_x_min c_x_max c_y_min c_y_max image_size num_threads\n");
-    printf("examples with image_size = 11500 and num_threads = 5:\n");
-    printf("    Full Picture:         ./mandelbrot_pth -2.5 1.5 -2.0 2.0 11500 5\n");
-    printf("    Seahorse Valley:      ./mandelbrot_pth -0.8 -0.7 0.05 0.15 11500 5\n");
-    printf("    Elephant Valley:      ./mandelbrot_pth 0.175 0.375 -0.1 0.1 11500 5\n");
-    printf("    Triple Spiral Valley: ./mandelbrot_pth -0.188 -0.012 0.554 0.754 11500 5\n");
+    printf("usage: ./mandelbrot_ompi c_x_min c_x_max c_y_min c_y_max image_size\n");
+    printf("examples with image_size = 11500:\n");
+    printf("    Full Picture:         ./mandelbrot_pth -2.5 1.5 -2.0 2.0 11500\n");
+    printf("    Seahorse Valley:      ./mandelbrot_pth -0.8 -0.7 0.05 0.15 11500\n");
+    printf("    Elephant Valley:      ./mandelbrot_pth 0.175 0.375 -0.1 0.1 11500\n");
+    printf("    Triple Spiral Valley: ./mandelbrot_pth -0.188 -0.012 0.554 0.754 11500\n");
     exit(0);
   }
   else
@@ -179,7 +179,7 @@ void compute_mandelbrot()
 
   if (task_id == MASTER)
   {
-    allocate_image_buffer();
+    // allocate_image_buffer();
 
     for (int i = 1; i <= num_slaves; i++)
     {
@@ -195,12 +195,12 @@ void compute_mandelbrot()
 
       for (int j = 0; j < work_amount_task_i; j++)
       {
-        update_rgb_buffer(rgb_data_array[j].iteration, rgb_data_array[j].x, rgb_data_array[j].y);
+        // update_rgb_buffer(rgb_data_array[j].iteration, rgb_data_array[j].x, rgb_data_array[j].y);
       }
 
     }
 
-    write_to_file();
+    // write_to_file();
   }
   else if (task_id <= num_slaves)
   {
@@ -299,24 +299,23 @@ void compute_mandelbrot_seq() {
         z_y_squared = z_y * z_y;
       };
 
-      update_rgb_buffer(iteration, i_x, i_y);
+      // update_rgb_buffer(iteration, i_x, i_y);
     };
   };
 };
 
 int main(int argc, char *argv[])
 {
-  // MPI_Init(&argc, &argv);
-  MPI_Init(NULL, NULL);
+  MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &task_id);
   MPI_Comm_size(MPI_COMM_WORLD, &num_tasks);
 
   init(argc, argv);
 
   if (num_tasks == 1) {
-    allocate_image_buffer();
+    // allocate_image_buffer();
     compute_mandelbrot_seq();
-    write_to_file();
+    // write_to_file();
   } else {
     compute_mandelbrot();
   }
