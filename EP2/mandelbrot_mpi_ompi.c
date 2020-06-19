@@ -98,7 +98,11 @@ void init(int argc, char *argv[])
 {
   if (argc < 7)
   {
+<<<<<<< HEAD
     printf("usage: ./mandelbrot_mpi_ompi c_x_min c_x_max c_y_min c_y_max image_size num_threads\n");
+=======
+    printf("usage: ./mandelbrot_pth c_x_min c_x_max c_y_min c_y_max image_size num_threads\n");
+>>>>>>> 9abbb71... Initial commit for this parallel version using MPI and OMPI.
     printf("examples with image_size = 11500 and num_threads = 5:\n");
     printf("    Full Picture:         ./mandelbrot_pth -2.5 1.5 -2.0 2.0 11500 5\n");
     printf("    Seahorse Valley:      ./mandelbrot_pth -0.8 -0.7 0.05 0.15 11500 5\n");
@@ -184,7 +188,11 @@ void compute_mandelbrot()
 
   if (task_id == MASTER)
   {
+<<<<<<< HEAD
     // allocate_image_buffer();
+=======
+    allocate_image_buffer();
+>>>>>>> 9abbb71... Initial commit for this parallel version using MPI and OMPI.
 
     for (int i = 1; i <= num_slaves; i++)
     {
@@ -200,12 +208,20 @@ void compute_mandelbrot()
 
       for (int j = 0; j < work_amount_task_i; j++)
       {
+<<<<<<< HEAD
         // update_rgb_buffer(rgb_data_array[j].iteration, rgb_data_array[j].x, rgb_data_array[j].y);
+=======
+        update_rgb_buffer(rgb_data_array[j].iteration, rgb_data_array[j].x, rgb_data_array[j].y);
+>>>>>>> 9abbb71... Initial commit for this parallel version using MPI and OMPI.
       }
 
     }
 
+<<<<<<< HEAD
     // write_to_file();
+=======
+    write_to_file();
+>>>>>>> 9abbb71... Initial commit for this parallel version using MPI and OMPI.
   }
   else if (task_id <= num_slaves)
   {
@@ -311,7 +327,11 @@ void compute_mandelbrot_seq() {
         z_y_squared = z_y * z_y;
       };
 
+<<<<<<< HEAD
       // update_rgb_buffer(iteration, i_x, i_y);
+=======
+      update_rgb_buffer(iteration, i_x, i_y);
+>>>>>>> 9abbb71... Initial commit for this parallel version using MPI and OMPI.
     };
   };
 };
@@ -325,9 +345,15 @@ int main(int argc, char *argv[])
   init(argc, argv);
 
   if (num_tasks == 1) {
+<<<<<<< HEAD
     // allocate_image_buffer();
     compute_mandelbrot_seq();
     // write_to_file();
+=======
+    allocate_image_buffer();
+    compute_mandelbrot_seq();
+    write_to_file();
+>>>>>>> 9abbb71... Initial commit for this parallel version using MPI and OMPI.
   } else {
     compute_mandelbrot();
   }
