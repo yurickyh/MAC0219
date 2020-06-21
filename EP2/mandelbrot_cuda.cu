@@ -23,8 +23,8 @@ void print_instructions() {
 void write_to_file(unsigned char *image_buffer, int i_x_max, int i_y_max,
                    int image_buffer_size) {
   FILE *file;
-  char *filename = "output.ppm";
-  char *comment = "# ";
+  const char *filename = "output.ppm";
+  const char *comment = "# ";
 
   int max_color_component_value = 255;
 
