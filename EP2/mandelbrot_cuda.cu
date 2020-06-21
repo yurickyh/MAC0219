@@ -1,23 +1,15 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
 
-using namespace std;
-
-double c_x_min;
-double c_x_max;
-double c_y_min;
-double c_y_max;
-
-double pixel_width;
-double pixel_height;
-
-int image_size;
-
-int i_x_max;
-int i_y_max;
-int image_buffer_size;
+#define cudaAssertSuccess(ans) { _cudaAssertSuccess((ans), __FILE__, __LINE__); }
+inline void _cudaAssertSuccess(cudaError_t code, char *file, int line)
+{
+  if (code != cudaSuccess)  {
+    fprintf(stderr,"_cudaAssertSuccess: %s %s %d\n", cudaGetErrorString(code), file, line);
+    exit(code);
+  }
+}
 
 void print_error_message() {
   printf(
@@ -37,29 +29,12 @@ void print_error_message() {
   exit(0);
 };
 
-// void write_to_file() {
-//   FILE *file;
-//   char *filename = "output.ppm";
-//   char *comment = "# ";
-
-//   int max_color_component_value = 255;
-
-//   file = fopen(filename, "wb");
-
-//   fprintf(file, "P6\n %s\n %d\n %d\n %d\n", comment, i_x_max, i_y_max,
-//           max_color_component_value);
-
-//   for (int i = 0; i < image_buffer_size; i++) {
-//     fwrite(image_buffer[i], 1, 3, file);
-//   };
-
-//   fclose(file);
-// };
-
 __global__ 
-void compute_mandelbrot(float* image_buffer, int gradient_size, int pixel_height,
-                        int pixel_width, int i_x_max, int i_y_max, int iteration_max,
-                        double c_x_min, double c_x_max, double c_y_min, double c_y_max) {
+void compute_mandelbrot(unsigned char *d_image_buffer, int gradient_size,
+                        int iteration_max, double c_x_min, double c_x_max,
+                        double c_y_min, double c_y_max, int image_buffer_size,
+                        int i_x_max, int i_y_max, double pixel_width,
+                        double pixel_height) {
   double z_x;
   double z_y;
   double z_x_squared;
@@ -74,11 +49,11 @@ void compute_mandelbrot(float* image_buffer, int gradient_size, int pixel_height
   double c_y;
 
   int colors[17][3] = {
-    {66, 30, 15},    {25, 7, 26},     {9, 1, 47},      {4, 4, 73},
-    {0, 7, 100},     {12, 44, 138},   {24, 82, 177},   {57, 125, 209},
-    {134, 181, 229}, {211, 236, 248}, {241, 233, 191}, {248, 201, 95},
-    {255, 170, 0},   {204, 128, 0},   {153, 87, 0},    {106, 52, 3},
-    {16, 16, 16},
+      {66, 30, 15},    {25, 7, 26},     {9, 1, 47},      {4, 4, 73},
+      {0, 7, 100},     {12, 44, 138},   {24, 82, 177},   {57, 125, 209},
+      {134, 181, 229}, {211, 236, 248}, {241, 233, 191}, {248, 201, 95},
+      {255, 170, 0},   {204, 128, 0},   {153, 87, 0},    {106, 52, 3},
+      {16, 16, 16},
   };
 
   for (i_y = 0; i_y < i_y_max; i_y++) {
@@ -107,30 +82,20 @@ void compute_mandelbrot(float* image_buffer, int gradient_size, int pixel_height
         z_y_squared = z_y * z_y;
       };
 
-      int color;
-
       if (iteration == iteration_max) {
-        image_buffer[(i_y_max * i_y) + i_x] = colors[gradient_size][0];
-        image_buffer[(i_y_max * i_y) + i_x+1] = colors[gradient_size][1];
-        image_buffer[(i_y_max * i_y) + i_x+2] = colors[gradient_size][2];
+        d_image_buffer[(i_y_max * i_y) + i_x] = colors[16][0];
+        d_image_buffer[(i_y_max * i_y) + i_x + image_buffer_size] =
+            colors[16][1];
+        d_image_buffer[(i_y_max * i_y) + i_x + (2 * image_buffer_size)] =
+            colors[16][2];
       } else {
-        color = iteration % gradient_size;
-
-        image_buffer[(i_y_max * i_y) + i_x] = colors[color][0];
-        image_buffer[(i_y_max * i_y) + i_x+1] = colors[color][1];
-        image_buffer[(i_y_max * i_y) + i_x+2] = colors[color][2];
+        int color = iteration % 16;
+        d_image_buffer[(i_y_max * i_y) + i_x] = colors[color][0];
+        d_image_buffer[(i_y_max * i_y) + i_x + image_buffer_size] =
+            colors[color][1];
+        d_image_buffer[(i_y_max * i_y) + i_x + (2 * image_buffer_size)] =
+            colors[color][2];
       };
-      // if (iteration == iteration_max) {
-      //   image_buffer[(i_y_max * i_y) + i_x][0] = colors[gradient_size][0];
-      //   image_buffer[(i_y_max * i_y) + i_x][1] = colors[gradient_size][1];
-      //   image_buffer[(i_y_max * i_y) + i_x][2] = colors[gradient_size][2];
-      // } else {
-      //   color = iteration % gradient_size;
-
-      //   image_buffer[(i_y_max * i_y) + i_x][0] = colors[color][0];
-      //   image_buffer[(i_y_max * i_y) + i_x][1] = colors[color][1];
-      //   image_buffer[(i_y_max * i_y) + i_x][2] = colors[color][2];
-      // };
     };
   };
 };
@@ -138,55 +103,69 @@ void compute_mandelbrot(float* image_buffer, int gradient_size, int pixel_height
 int main(int argc, char *argv[]) {
   if (argc < 6) {
     print_error_message();
-  } else {
-    sscanf(argv[1], "%lf", &c_x_min);
-    sscanf(argv[2], "%lf", &c_x_max);
-    sscanf(argv[3], "%lf", &c_y_min);
-    sscanf(argv[4], "%lf", &c_y_max);
-    sscanf(argv[5], "%d", &image_size);
+    return 0;
+  }
 
-    i_x_max = image_size;
-    i_y_max = image_size;
-    image_buffer_size = image_size * image_size;
+  double c_x_min;
+  double c_x_max;
+  double c_y_min;
+  double c_y_max;
 
-    pixel_width = (c_x_max - c_x_min) / i_x_max;
-    pixel_height = (c_y_max - c_y_min) / i_y_max;
-  };
+  int image_size;
+  unsigned char *image_buffer;
+  unsigned char *d_image_buffer;
 
-  float *image_buffer;
-  int iteration_max = 200;
   int gradient_size = 16;
+  int iteration_max = 200;
+
+  sscanf(argv[1], "%lf", &c_x_min);
+  sscanf(argv[2], "%lf", &c_x_max);
+  sscanf(argv[3], "%lf", &c_y_min);
+  sscanf(argv[4], "%lf", &c_y_max);
+  sscanf(argv[5], "%d", &image_size);
+
+  int i_x_max = image_size;
+  int i_y_max = image_size;
+
+  int image_buffer_size = image_size * image_size;
+
+  double pixel_width = (c_x_max - c_x_min) / i_x_max;
+  double pixel_height = (c_y_max - c_y_min) / i_y_max;
 
   int rgb_size = 3;
+  image_buffer = (unsigned char *)malloc(sizeof(unsigned char) *
+                                         image_buffer_size * rgb_size);
 
-  cudaMallocManaged(&image_buffer, (image_buffer_size * rgb_size)*sizeof(float));
+  cudaAssertSuccess(cudaMalloc(&d_image_buffer, sizeof(unsigned char) * image_buffer_size * rgb_size));
 
-  compute_mandelbrot<<<1, 1>>>(image_buffer, gradient_size, pixel_height, pixel_width, 
-                     i_x_max, i_y_max, iteration_max, c_x_min, c_x_max, c_y_min,
-                     c_y_max);
+  compute_mandelbrot<<<1, 1>>>(d_image_buffer, gradient_size, iteration_max, c_x_min,
+                     c_x_max, c_y_min, c_y_max, image_buffer_size, i_x_max,
+                     i_y_max, pixel_width, pixel_height);
 
-  cudaDeviceSynchronize();
+  cudaAssertSuccess(cudaPeekAtLastError());
+  cudaAssertSuccess(cudaDeviceSynchronize());
 
-  cout << image_buffer[20] << endl;
+  cudaAssertSuccess(cudaMemcpy(image_buffer, d_image_buffer, sizeof(unsigned char) * image_buffer_size * rgb_size, cudaMemcpyDeviceToHost));
 
-  // write_to_file();
+  FILE *file;
+  char *filename = "output.ppm";
+  char *comment = "# ";
 
-  // FILE *file;
-  // char *filename = "output.ppm";
-  // char *comment = "# ";
+  int max_color_component_value = 255;
 
-  // int max_color_component_value = 255;
+  file = fopen(filename, "wb");
 
-  // file = fopen(filename, "wb");
+  fprintf(file, "P6\n %s\n %d\n %d\n %d\n", comment, i_x_max, i_y_max,
+          max_color_component_value);
 
-  // fprintf(file, "P6\n %s\n %d\n %d\n %d\n", comment, i_x_max, i_y_max,
-  //         max_color_component_value);
+  for (int i = 0; i < image_buffer_size; i++) {
+    unsigned char buffer[3] = {image_buffer[i],
+                               image_buffer[i + image_buffer_size],
+                               image_buffer[i + (image_buffer_size * 2)]};
+    fwrite(buffer, 1, 3, file);
+  };
 
-  // for (int i = 0; i < image_buffer_size; i++) {
-  //   fwrite(image_buffer[i], 1, 3, file);
-  // };
-
-  // fclose(file);
+  fclose(file);
 
   return 0;
 };
