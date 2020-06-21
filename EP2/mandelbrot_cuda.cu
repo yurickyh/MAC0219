@@ -5,18 +5,18 @@
 void print_instructions() {
   printf(
       "usage: ./mandelbrot_cuda c_x_min c_x_max c_y_min c_y_max image_size\n");
-  printf("examples with image_size = 11500:\n");
+  printf("examples with image_size = 4096 and num_threads = 256:\n");
   printf(
-      "    Full Picture:         ./mandelbrot_cuda -2.5 1.5 -2.0 2.0 11500\n");
+      "    Full Picture:         ./mandelbrot_cuda -2.5 1.5 -2.0 2.0 4096 256\n");
   printf(
       "    Seahorse Valley:      ./mandelbrot_cuda -0.8 -0.7 0.05 0.15 "
-      "11500\n");
+      "4096 256\n");
   printf(
       "    Elephant Valley:      ./mandelbrot_cuda 0.175 0.375 -0.1 0.1 "
-      "11500\n");
+      "4096 256\n");
   printf(
       "    Triple Spiral Valley: ./mandelbrot_cuda -0.188 -0.012 0.554 0.754 "
-      "11500\n");
+      "4096 256\n");
   exit(0);
 };
 
@@ -118,7 +118,7 @@ void compute_mandelbrot(unsigned char *d_image_buffer, int gradient_size,
 };
 
 int main(int argc, char *argv[]) {
-  if (argc < 6) {
+  if (argc < 7) {
     print_instructions();
     return 0;
   }
@@ -129,6 +129,7 @@ int main(int argc, char *argv[]) {
   double c_y_max;
 
   int image_size;
+  int num_threads;
   unsigned char *image_buffer;
   unsigned char *d_image_buffer;
 
@@ -140,6 +141,7 @@ int main(int argc, char *argv[]) {
   sscanf(argv[3], "%lf", &c_y_min);
   sscanf(argv[4], "%lf", &c_y_max);
   sscanf(argv[5], "%d", &image_size);
+  sscanf(argv[6], "%d", &num_threads);
 
   int i_x_max = image_size;
   int i_y_max = image_size;
@@ -155,12 +157,13 @@ int main(int argc, char *argv[]) {
 
   cudaMalloc(&d_image_buffer, sizeof(unsigned char) * image_buffer_size * rgb_size);
 
-  int blockSize = 256;
+  int blockSize = num_threads;
   int numBlocks = (image_buffer_size + blockSize - 1) / blockSize;
 
-  compute_mandelbrot<<<numBlocks, blockSize>>>(d_image_buffer, gradient_size, iteration_max, c_x_min,
-                     c_x_max, c_y_min, c_y_max, image_buffer_size, i_x_max,
-                     i_y_max, pixel_width, pixel_height);
+  compute_mandelbrot<<<numBlocks, blockSize>>>(d_image_buffer, gradient_size,
+                     iteration_max, c_x_min, c_x_max, c_y_min, c_y_max,
+                     image_buffer_size, i_x_max, i_y_max, pixel_width,
+                     pixel_height);
 
   cudaDeviceSynchronize();
 
