@@ -2,31 +2,45 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define cudaAssertSuccess(ans) { _cudaAssertSuccess((ans), __FILE__, __LINE__); }
-inline void _cudaAssertSuccess(cudaError_t code, char *file, int line)
-{
-  if (code != cudaSuccess)  {
-    fprintf(stderr,"_cudaAssertSuccess: %s %s %d\n", cudaGetErrorString(code), file, line);
-    exit(code);
-  }
-}
-
-void print_error_message() {
+void print_instructions() {
   printf(
-      "usage: ./mandelbrot_seq c_x_min c_x_max c_y_min c_y_max image_size\n");
+      "usage: ./mandelbrot_cuda c_x_min c_x_max c_y_min c_y_max image_size\n");
   printf("examples with image_size = 11500:\n");
   printf(
-      "    Full Picture:         ./mandelbrot_seq -2.5 1.5 -2.0 2.0 11500\n");
+      "    Full Picture:         ./mandelbrot_cuda -2.5 1.5 -2.0 2.0 11500\n");
   printf(
-      "    Seahorse Valley:      ./mandelbrot_seq -0.8 -0.7 0.05 0.15 "
+      "    Seahorse Valley:      ./mandelbrot_cuda -0.8 -0.7 0.05 0.15 "
       "11500\n");
   printf(
-      "    Elephant Valley:      ./mandelbrot_seq 0.175 0.375 -0.1 0.1 "
+      "    Elephant Valley:      ./mandelbrot_cuda 0.175 0.375 -0.1 0.1 "
       "11500\n");
   printf(
-      "    Triple Spiral Valley: ./mandelbrot_seq -0.188 -0.012 0.554 0.754 "
+      "    Triple Spiral Valley: ./mandelbrot_cuda -0.188 -0.012 0.554 0.754 "
       "11500\n");
   exit(0);
+};
+
+void write_to_file(unsigned char *image_buffer, int i_x_max, int i_y_max,
+                   int image_buffer_size) {
+  FILE *file;
+  char *filename = "output.ppm";
+  char *comment = "# ";
+
+  int max_color_component_value = 255;
+
+  file = fopen(filename, "wb");
+
+  fprintf(file, "P6\n %s\n %d\n %d\n %d\n", comment, i_x_max, i_y_max,
+          max_color_component_value);
+
+  for (int i = 0; i < image_buffer_size; i++) {
+    unsigned char buffer[3] = {image_buffer[i],
+                              image_buffer[i + image_buffer_size],
+                              image_buffer[i + (image_buffer_size * 2)]};
+    fwrite(buffer, 1, 3, file);
+  };
+
+  fclose(file);
 };
 
 __global__ 
@@ -56,7 +70,10 @@ void compute_mandelbrot(unsigned char *d_image_buffer, int gradient_size,
       {16, 16, 16},
   };
 
-  for (i_y = 0; i_y < i_y_max; i_y++) {
+  int index = blockIdx.x * blockDim.x + threadIdx.x;
+  int stride = blockDim.x * gridDim.x;
+
+  for (i_y = index; i_y < i_y_max; i_y += stride) {
     c_y = c_y_min + i_y * pixel_height;
 
     if (fabs(c_y) < pixel_height / 2) {
@@ -102,7 +119,7 @@ void compute_mandelbrot(unsigned char *d_image_buffer, int gradient_size,
 
 int main(int argc, char *argv[]) {
   if (argc < 6) {
-    print_error_message();
+    print_instructions();
     return 0;
   }
 
@@ -136,36 +153,22 @@ int main(int argc, char *argv[]) {
   image_buffer = (unsigned char *)malloc(sizeof(unsigned char) *
                                          image_buffer_size * rgb_size);
 
-  cudaAssertSuccess(cudaMalloc(&d_image_buffer, sizeof(unsigned char) * image_buffer_size * rgb_size));
+  cudaMalloc(&d_image_buffer, sizeof(unsigned char) * image_buffer_size * rgb_size);
 
-  compute_mandelbrot<<<1, 1>>>(d_image_buffer, gradient_size, iteration_max, c_x_min,
+  int blockSize = 256;
+  int numBlocks = (image_buffer_size + blockSize - 1) / blockSize;
+
+  compute_mandelbrot<<<numBlocks, blockSize>>>(d_image_buffer, gradient_size, iteration_max, c_x_min,
                      c_x_max, c_y_min, c_y_max, image_buffer_size, i_x_max,
                      i_y_max, pixel_width, pixel_height);
 
-  cudaAssertSuccess(cudaPeekAtLastError());
-  cudaAssertSuccess(cudaDeviceSynchronize());
+  cudaDeviceSynchronize();
 
-  cudaAssertSuccess(cudaMemcpy(image_buffer, d_image_buffer, sizeof(unsigned char) * image_buffer_size * rgb_size, cudaMemcpyDeviceToHost));
+  cudaMemcpy(image_buffer, d_image_buffer, 
+             sizeof(unsigned char) * image_buffer_size * rgb_size, 
+             cudaMemcpyDeviceToHost);
 
-  FILE *file;
-  char *filename = "output.ppm";
-  char *comment = "# ";
-
-  int max_color_component_value = 255;
-
-  file = fopen(filename, "wb");
-
-  fprintf(file, "P6\n %s\n %d\n %d\n %d\n", comment, i_x_max, i_y_max,
-          max_color_component_value);
-
-  for (int i = 0; i < image_buffer_size; i++) {
-    unsigned char buffer[3] = {image_buffer[i],
-                               image_buffer[i + image_buffer_size],
-                               image_buffer[i + (image_buffer_size * 2)]};
-    fwrite(buffer, 1, 3, file);
-  };
-
-  fclose(file);
+  write_to_file(image_buffer, i_x_max, i_y_max, image_buffer_size);
 
   return 0;
 };
