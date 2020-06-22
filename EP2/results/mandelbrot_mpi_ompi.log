@@ -1,0 +1,150 @@
+
+ Performance counter stats for 'mpirun -H localhost:1 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 1' (15 runs):
+
+      26,392380010 seconds time elapsed                                          ( +-  2,30% )
+
+
+ Performance counter stats for 'mpirun -H localhost:1 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 2' (15 runs):
+
+      25,298277909 seconds time elapsed                                          ( +-  0,04% )
+
+
+ Performance counter stats for 'mpirun -H localhost:1 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 4' (15 runs):
+
+      25,281704728 seconds time elapsed                                          ( +-  0,03% )
+
+
+ Performance counter stats for 'mpirun -H localhost:1 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 8' (15 runs):
+
+      25,281182790 seconds time elapsed                                          ( +-  0,03% )
+
+
+ Performance counter stats for 'mpirun -H localhost:1 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 16' (15 runs):
+
+      25,275931035 seconds time elapsed                                          ( +-  0,03% )
+
+
+ Performance counter stats for 'mpirun -H localhost:1 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 32' (15 runs):
+
+      25,238590271 seconds time elapsed                                          ( +-  0,02% )
+
+
+ Performance counter stats for 'mpirun -H localhost:8 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 1' (15 runs):
+
+       9,272021585 seconds time elapsed                                          ( +-  0,27% )
+
+
+ Performance counter stats for 'mpirun -H localhost:8 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 2' (15 runs):
+
+       9,343003770 seconds time elapsed                                          ( +-  0,59% )
+
+
+ Performance counter stats for 'mpirun -H localhost:8 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 4' (15 runs):
+
+       9,294780302 seconds time elapsed                                          ( +-  0,36% )
+
+
+ Performance counter stats for 'mpirun -H localhost:8 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 8' (15 runs):
+
+       9,269432759 seconds time elapsed                                          ( +-  0,52% )
+
+
+ Performance counter stats for 'mpirun -H localhost:8 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 16' (15 runs):
+
+       9,222270718 seconds time elapsed                                          ( +-  0,23% )
+
+
+ Performance counter stats for 'mpirun -H localhost:8 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 32' (15 runs):
+
+       9,226505161 seconds time elapsed                                          ( +-  0,37% )
+
+
+ Performance counter stats for 'mpirun -H localhost:16 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 1' (15 runs):
+
+       9,018743328 seconds time elapsed                                          ( +-  1,20% )
+
+
+ Performance counter stats for 'mpirun -H localhost:16 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 2' (15 runs):
+
+       8,885424480 seconds time elapsed                                          ( +-  0,66% )
+
+
+ Performance counter stats for 'mpirun -H localhost:16 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 4' (15 runs):
+
+       9,058909329 seconds time elapsed                                          ( +-  1,18% )
+
+
+ Performance counter stats for 'mpirun -H localhost:16 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 8' (15 runs):
+
+       8,999841241 seconds time elapsed                                          ( +-  0,92% )
+
+
+ Performance counter stats for 'mpirun -H localhost:16 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 16' (15 runs):
+
+       9,057414368 seconds time elapsed                                          ( +-  0,96% )
+
+
+ Performance counter stats for 'mpirun -H localhost:16 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 32' (15 runs):
+
+       8,894366603 seconds time elapsed                                          ( +-  0,28% )
+
+
+ Performance counter stats for 'mpirun -H localhost:32 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 1' (15 runs):
+
+       9,304721831 seconds time elapsed                                          ( +-  0,72% )
+
+
+ Performance counter stats for 'mpirun -H localhost:32 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 2' (15 runs):
+
+       9,386139106 seconds time elapsed                                          ( +-  0,59% )
+
+
+ Performance counter stats for 'mpirun -H localhost:32 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 4' (15 runs):
+
+       9,353792375 seconds time elapsed                                          ( +-  0,60% )
+
+
+ Performance counter stats for 'mpirun -H localhost:32 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 8' (15 runs):
+
+       9,186935919 seconds time elapsed                                          ( +-  0,59% )
+
+
+ Performance counter stats for 'mpirun -H localhost:32 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 16' (15 runs):
+
+       9,179262253 seconds time elapsed                                          ( +-  0,74% )
+
+
+ Performance counter stats for 'mpirun -H localhost:32 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 32' (15 runs):
+
+       9,305034872 seconds time elapsed                                          ( +-  0,82% )
+
+
+ Performance counter stats for 'mpirun -H localhost:64 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 1' (15 runs):
+
+      10,294873336 seconds time elapsed                                          ( +-  0,53% )
+
+
+ Performance counter stats for 'mpirun -H localhost:64 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 2' (15 runs):
+
+      10,446364460 seconds time elapsed                                          ( +-  0,44% )
+
+
+ Performance counter stats for 'mpirun -H localhost:64 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 4' (15 runs):
+
+      10,353787072 seconds time elapsed                                          ( +-  0,61% )
+
+
+ Performance counter stats for 'mpirun -H localhost:64 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 8' (15 runs):
+
+      10,475160835 seconds time elapsed                                          ( +-  0,45% )
+
+
+ Performance counter stats for 'mpirun -H localhost:64 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 16' (15 runs):
+
+      10,324420739 seconds time elapsed                                          ( +-  0,52% )
+
+
+ Performance counter stats for 'mpirun -H localhost:64 ./mandelbrot_mpi_ompi -0.188 -0.012 0.554 0.754 4096 32' (15 runs):
+
+      10,302360697 seconds time elapsed                                          ( +-  0,51% )
+
