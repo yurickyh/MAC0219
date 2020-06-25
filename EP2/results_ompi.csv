@@ -1,4 +1,4 @@
-script,threads,mean,ci
+script,processes,mean,ci
 mandelbrot_ompi,1,30.790634974,0.022901080
 mandelbrot_ompi,8,18.005541128,0.161819275
 mandelbrot_ompi,16,17.951726470,0.164673611
