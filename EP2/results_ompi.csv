@@ -1,0 +1,6 @@
+script,threads,mean,ci
+mandelbrot_ompi,1,30.790634974,0.022901080
+mandelbrot_ompi,8,18.005541128,0.161819275
+mandelbrot_ompi,16,17.951726470,0.164673611
+mandelbrot_ompi,32,19.130449462,0.216986310
+mandelbrot_ompi,64,23.872928497,0.250062445
