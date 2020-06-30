@@ -1,0 +1,5 @@
+
+ Performance counter stats for './mandelbrot_seq -0.188 -0.012 0.554 0.754 4096' (15 runs):
+
+      24,091894906 seconds time elapsed                                          ( +-  0,18% )
+

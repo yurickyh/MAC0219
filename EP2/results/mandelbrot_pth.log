@@ -1,0 +1,30 @@
+
+ Performance counter stats for './mandelbrot_pth -0.188 -0.012 0.554 0.754 4096 1' (15 runs):
+
+      23,310787393 seconds time elapsed                                          ( +-  0,03% )
+
+
+ Performance counter stats for './mandelbrot_pth -0.188 -0.012 0.554 0.754 4096 2' (15 runs):
+
+      12,728455312 seconds time elapsed                                          ( +-  0,05% )
+
+
+ Performance counter stats for './mandelbrot_pth -0.188 -0.012 0.554 0.754 4096 4' (15 runs):
+
+       8,212614732 seconds time elapsed                                          ( +-  0,13% )
+
+
+ Performance counter stats for './mandelbrot_pth -0.188 -0.012 0.554 0.754 4096 8' (15 runs):
+
+       7,772377457 seconds time elapsed                                          ( +-  0,21% )
+
+
+ Performance counter stats for './mandelbrot_pth -0.188 -0.012 0.554 0.754 4096 16' (15 runs):
+
+       7,794106405 seconds time elapsed                                          ( +-  0,52% )
+
+
+ Performance counter stats for './mandelbrot_pth -0.188 -0.012 0.554 0.754 4096 32' (15 runs):
+
+       7,719297476 seconds time elapsed                                          ( +-  0,11% )
+
