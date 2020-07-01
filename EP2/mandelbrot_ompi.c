@@ -10,6 +10,13 @@
 int num_tasks;
 int task_id;
 
+typedef struct
+{
+  int x;
+  int y;
+  int iteration;
+} rgb_data;
+
 // ----------------------------------------------
 
 double c_x_min;
@@ -50,13 +57,6 @@ int colors[17][3] = {
     {16, 16, 16},
 };
 
-typedef struct
-{
-  int x;
-  int y;
-  int iteration;
-} rgb_data;
-
 void update_rgb_buffer(int iteration, int x, int y)
 {
   int color;
@@ -76,8 +76,6 @@ void update_rgb_buffer(int iteration, int x, int y)
     image_buffer[(i_y_max * y) + x][2] = colors[color][2];
   };
 };
-
-// END THREAD FUNCTIONS
 
 void allocate_image_buffer()
 {
@@ -141,6 +139,7 @@ void write_to_file()
   fclose(file);
 };
 
+// get the number of slave processes
 int get_number_slaves()
 {
   if ((num_tasks - 1) > image_buffer_size)
@@ -148,6 +147,7 @@ int get_number_slaves()
   return (num_tasks - 1);
 }
 
+// get the work amount of a specific process
 int get_work_amount(int task, int work_by_task, int num_slaves)
 {
   if (task == num_slaves)
@@ -177,9 +177,14 @@ void compute_mandelbrot()
   MPI_Type_create_struct(3, blockcounts, offsets, types, &rgb_data_type);
   MPI_Type_commit(&rgb_data_type);
 
+  // -------------------------------------------------------------------
+  // --------------------------- MASTER --------------------------------
+  // -------------------------------------------------------------------
+  // The master process allocates memory for the image_buffer array and sends the message
+  // After receiving the response, then fulfill the rgb_buffer and generate the image
   if (task_id == MASTER)
   {
-    // allocate_image_buffer();
+    allocate_image_buffer();
 
     for (int i = 1; i <= num_slaves; i++)
     {
@@ -195,20 +200,28 @@ void compute_mandelbrot()
 
       for (int j = 0; j < work_amount_task_i; j++)
       {
-        // update_rgb_buffer(rgb_data_array[j].iteration, rgb_data_array[j].x, rgb_data_array[j].y);
+        update_rgb_buffer(rgb_data_array[j].iteration, rgb_data_array[j].x, rgb_data_array[j].y);
       }
 
     }
 
-    // write_to_file();
+    write_to_file();
   }
+  // -------------------------------------------------------------------
+  // --------------------------- SLAVES --------------------------------
+  // -------------------------------------------------------------------
+  // Each slave process will be responsible for calculating, for a certain portion of
+  // pixels in the resulting image, the number of iterations. They are sent back to the
+  // master process that will update the rgb_buffer.
   else if (task_id <= num_slaves)
   {
     int this_task;
     MPI_Recv(&this_task, 1, MPI_INT, MASTER, 0, MPI_COMM_WORLD, &status);
 
+    // alocatting the data that will pass to the message
     rgb_data_array = malloc(work_this_task * sizeof(rgb_data));
 
+    // defines the first position that the specific task will cover
     int first_buffer_position = (task_id - 1) * work_by_task;
 
     for (int i = 0; i < work_this_task; i++)
@@ -259,6 +272,7 @@ void compute_mandelbrot()
   MPI_Finalize();
 };
 
+// sequential function to compute mandelbrot for specific case with a single process
 void compute_mandelbrot_seq() {
   double z_x;
   double z_y;
@@ -299,7 +313,7 @@ void compute_mandelbrot_seq() {
         z_y_squared = z_y * z_y;
       };
 
-      // update_rgb_buffer(iteration, i_x, i_y);
+      update_rgb_buffer(iteration, i_x, i_y);
     };
   };
 };
@@ -312,10 +326,11 @@ int main(int argc, char *argv[])
 
   init(argc, argv);
 
+  // for a single process, then it executes the parallel version of mandelbrot
   if (num_tasks == 1) {
-    // allocate_image_buffer();
+    allocate_image_buffer();
     compute_mandelbrot_seq();
-    // write_to_file();
+    write_to_file();
   } else {
     compute_mandelbrot();
   }

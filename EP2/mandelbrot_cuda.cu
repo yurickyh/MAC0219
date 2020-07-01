@@ -4,19 +4,19 @@
 
 void print_instructions() {
   printf(
-      "usage: ./mandelbrot_cuda c_x_min c_x_max c_y_min c_y_max image_size\n");
-  printf("examples with image_size = 4096 and num_threads = 256:\n");
+      "usage: ./mandelbrot_cuda c_x_min c_x_max c_y_min c_y_max image_size x_grid_dimension y_grid_dimension\n");
+  printf("examples with image_size = 4096, x_grid_dimension = 64 and y_grid_dimension = 64:\n");
   printf(
-      "    Full Picture:         ./mandelbrot_cuda -2.5 1.5 -2.0 2.0 4096 256\n");
+      "    Full Picture:         ./mandelbrot_cuda -2.5 1.5 -2.0 2.0 4096 64 64\n");
   printf(
       "    Seahorse Valley:      ./mandelbrot_cuda -0.8 -0.7 0.05 0.15 "
-      "4096 256\n");
+      "4096 64 64\n");
   printf(
       "    Elephant Valley:      ./mandelbrot_cuda 0.175 0.375 -0.1 0.1 "
-      "4096 256\n");
+      "4096 64 64\n");
   printf(
       "    Triple Spiral Valley: ./mandelbrot_cuda -0.188 -0.012 0.554 0.754 "
-      "4096 256\n");
+      "4096 64 64\n");
   exit(0);
 };
 
@@ -118,7 +118,7 @@ void compute_mandelbrot(unsigned char *d_image_buffer, int gradient_size,
 };
 
 int main(int argc, char *argv[]) {
-  if (argc < 7) {
+  if (argc < 8) {
     print_instructions();
     return 0;
   }
@@ -129,7 +129,8 @@ int main(int argc, char *argv[]) {
   double c_y_max;
 
   int image_size;
-  int num_threads;
+  int x_grid_dimension;
+  int y_grid_dimension;
   unsigned char *image_buffer;
   unsigned char *d_image_buffer;
 
@@ -141,7 +142,8 @@ int main(int argc, char *argv[]) {
   sscanf(argv[3], "%lf", &c_y_min);
   sscanf(argv[4], "%lf", &c_y_max);
   sscanf(argv[5], "%d", &image_size);
-  sscanf(argv[6], "%d", &num_threads);
+  sscanf(argv[6], "%d", &x_grid_dimension);
+  sscanf(argv[7], "%d", &y_grid_dimension);
 
   int i_x_max = image_size;
   int i_y_max = image_size;
@@ -157,10 +159,10 @@ int main(int argc, char *argv[]) {
 
   cudaMalloc(&d_image_buffer, sizeof(unsigned char) * image_buffer_size * rgb_size);
 
-  int blockSize = num_threads;
-  int numBlocks = (image_buffer_size + blockSize - 1) / blockSize;
+  int blockSize = 256;
+  dim3 gridSize = dim3(x_grid_dimension, y_grid_dimension);
 
-  compute_mandelbrot<<<numBlocks, blockSize>>>(d_image_buffer, gradient_size,
+  compute_mandelbrot<<<gridSize, blockSize>>>(d_image_buffer, gradient_size,
                      iteration_max, c_x_min, c_x_max, c_y_min, c_y_max,
                      image_buffer_size, i_x_max, i_y_max, pixel_width,
                      pixel_height);
@@ -171,7 +173,7 @@ int main(int argc, char *argv[]) {
              sizeof(unsigned char) * image_buffer_size * rgb_size, 
              cudaMemcpyDeviceToHost);
 
-  write_to_file(image_buffer, i_x_max, i_y_max, image_buffer_size);
+  // write_to_file(image_buffer, i_x_max, i_y_max, image_buffer_size);
 
   return 0;
 };
