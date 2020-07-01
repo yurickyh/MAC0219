@@ -98,6 +98,7 @@ void init(int argc, char *argv[])
 {
   if (argc < 7)
   {
+
     printf("usage: ./mandelbrot_mpi_ompi c_x_min c_x_max c_y_min c_y_max image_size num_threads\n");
     printf("examples with image_size = 11500 and num_threads = 5:\n");
     printf("    Full Picture:         ./mandelbrot_pth -2.5 1.5 -2.0 2.0 11500 5\n");
@@ -198,10 +199,10 @@ void compute_mandelbrot()
 
       MPI_Recv(rgb_data_array, work_amount_task_i, rgb_data_type, i, 1, MPI_COMM_WORLD, &status);
 
-      for (int j = 0; j < work_amount_task_i; j++)
-      {
-        // update_rgb_buffer(rgb_data_array[j].iteration, rgb_data_array[j].x, rgb_data_array[j].y);
-      }
+      // for (int j = 0; j < work_amount_task_i; j++)
+      // {
+      //   update_rgb_buffer(rgb_data_array[j].iteration, rgb_data_array[j].x, rgb_data_array[j].y);
+      // }
 
     }
 
