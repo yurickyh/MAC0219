@@ -1,0 +1,50 @@
+  
+  Performance counter stats for './mandelbrot_cuda -0.188 -0.012 0.554 0.754 4096 1 1' (15 runs):
+
+      2,25133 +- 0,00158 seconds time elapsed                                          ( +-  0,07% ) 
+
+
+  Performance counter stats for './mandelbrot_cuda -0.188 -0.012 0.554 0.754 4096 2 2' (15 runs):
+
+      1,19167 +- 0,00121 seconds time elapsed                                          ( +-  0,10% )
+
+
+  Performance counter stats for './mandelbrot_cuda -0.188 -0.012 0.554 0.754 4096 4 4' (15 runs):
+
+      0,68676 +- 0,00562 seconds time elapsed                                          ( +-  0,82% ) 
+
+
+  Performance counter stats for './mandelbrot_cuda -0.188 -0.012 0.554 0.754 4096 8 8' (15 runs):
+
+      0,62615 +- 0,00821 seconds time elapsed                                          ( +-  1,31% )
+ 
+
+  Performance counter stats for './mandelbrot_cuda -0.188 -0.012 0.554 0.754 4096 12 12' (15 runs):
+
+      0,98198 +- 0,00286 seconds time elapsed                                          ( +-  0,29% )
+ 
+
+  Performance counter stats for './mandelbrot_cuda -0.188 -0.012 0.554 0.754 4096 16 16' (15 runs):
+
+      1,25094 +- 0,00367 seconds time elapsed                                          ( +-  0,29% )
+
+
+  Performance counter stats for './mandelbrot_cuda -0.188 -0.012 0.554 0.754 4096 24 24' (15 runs):
+
+      1,72821 +- 0,00508 seconds time elapsed                                          ( +-  0,29% )
+  
+
+  Performance counter stats for './mandelbrot_cuda -0.188 -0.012 0.554 0.754 4096 32 32' (15 runs):
+
+      2,26355 +- 0,00354 seconds time elapsed                                          ( +-  0,16% )
+
+
+  Performance counter stats for './mandelbrot_cuda -0.188 -0.012 0.554 0.754 4096 48 48' (15 runs):
+
+      3,27187 +- 0,00328 seconds time elapsed                                          ( +-  0,10% )
+ 
+
+  Performance counter stats for './mandelbrot_cuda -0.188 -0.012 0.554 0.754 4096 64 64' (15 runs):
+
+      4,38169 +- 0,00580 seconds time elapsed                                          ( +-  0,13% )
+

@@ -32,7 +32,7 @@ $(OUTPUT)_mpi_ompi: $(OUTPUT)_mpi_ompi.c
 	$(CC_MPI) -o $(OUTPUT)_mpi_ompi $(OUTPUT)_mpi_ompi.c
 
 $(OUTPUT)_cuda: $(OUTPUT)_cuda.cu
-	$(CC_MPI) -o $(OUTPUT)_cuda $(OUTPUT)_cuda.cu
+	$(CC_CUDA) -o $(OUTPUT)_cuda $(OUTPUT)_cuda.cu
 
 .PHONY: clean
 clean:
