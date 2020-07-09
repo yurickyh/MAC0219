@@ -13,7 +13,9 @@ NAMES1=('mandelbrot_seq' 'mandelbrot_seq_sem')
 NAMES2=('mandelbrot_pth' 'mandelbrot_omp')
 
 make
-mkdir results
+if [ ! -d "results" ]; then
+    mkdir results
+fi
 
 for NAME in ${NAMES1[@]}; do
     perf stat -r $MEASUREMENTS -n ./$NAME -0.188 -0.012 0.554 0.754 $SIZE >> $NAME.log 2>&1
@@ -29,4 +31,5 @@ for NAME in ${NAMES2[@]}; do
     done
     THREADS=$INITIAL_THREADS
     mv *.log results
+    rm output.ppm
 done

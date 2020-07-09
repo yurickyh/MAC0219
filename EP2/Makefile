@@ -1,7 +1,5 @@
 OUTPUT=mandelbrot
 
-IMAGE=.ppm
-
 CC=gcc
 CC_OPT=-std=c11
 CC_MPI=mpicc
@@ -36,5 +34,5 @@ $(OUTPUT)_cuda: $(OUTPUT)_cuda.cu
 
 .PHONY: clean
 clean:
-	rm $(OUTPUT)_omp $(OUTPUT)_pth $(OUTPUT)_seq $(OUTPUT)_seq_sem $(OUTPUT)_ompi $(OUTPUT)_mpi_ompi $(OUTPUT)_cuda *$(IMAGE)
+	rm $(OUTPUT)_omp $(OUTPUT)_pth $(OUTPUT)_seq $(OUTPUT)_seq_sem $(OUTPUT)_ompi $(OUTPUT)_mpi_ompi $(OUTPUT)_cuda
 

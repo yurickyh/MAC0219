@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
              sizeof(unsigned char) * image_buffer_size * rgb_size, 
              cudaMemcpyDeviceToHost);
 
-  // write_to_file(image_buffer, i_x_max, i_y_max, image_buffer_size);
+  write_to_file(image_buffer, i_x_max, i_y_max, image_buffer_size);
 
   return 0;
 };
