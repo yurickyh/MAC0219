@@ -18,7 +18,6 @@ for PROCESS in ${PROCESSES[@]}; do
     perf stat -r $MEASUREMENTS -n mpirun -H localhost:$PROCESS ./mandelbrot_ompi -0.188 -0.012 0.554 0.754 $SIZE >> mandelbrot_ompi.log 2>&1
 done
 mv *.log results
-rm output.ppm
 
 for PROCESS in ${PROCESSES[@]}; do
     for ((i=1; i<=THREADS_ITERATIONS; i++)) do
@@ -28,4 +27,3 @@ for PROCESS in ${PROCESSES[@]}; do
     THREADS=$INITIAL_THREADS    
 done
 mv *.log results
-rm output.ppm

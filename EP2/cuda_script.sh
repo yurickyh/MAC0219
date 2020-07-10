@@ -15,5 +15,4 @@ for G in ${GRID[@]}; do
     perf stat -r $MEASUREMENTS -n ./mandelbrot_cuda -0.188 -0.012 0.554 0.754 $SIZE $G $G >> mandelbrot_cuda.log 2>&1
 done
 mv *.log results
-rm output.ppm
 

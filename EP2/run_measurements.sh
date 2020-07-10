@@ -20,7 +20,6 @@ fi
 for NAME in ${NAMES1[@]}; do
     perf stat -r $MEASUREMENTS -n ./$NAME -0.188 -0.012 0.554 0.754 $SIZE >> $NAME.log 2>&1
     mv *.log results
-    rm output.ppm
 done
 
 for NAME in ${NAMES2[@]}; do
@@ -31,5 +30,4 @@ for NAME in ${NAMES2[@]}; do
     done
     THREADS=$INITIAL_THREADS
     mv *.log results
-    rm output.ppm
 done
